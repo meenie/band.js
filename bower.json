@@ -1,7 +1,7 @@
 {
-  "name": "8bit.js",
-  "version": "0.1.0",
-  "main": "build/8bit.min.js",
+  "name": "band.js",
+  "version": "0.2.0",
+  "main": "build/band.min.js",
   "ignore": [
     "**/.*",
     "node_modules",
