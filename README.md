@@ -106,7 +106,7 @@ as it's default rhythm notation.</td>
 <tr>
 <td valign="top"><code>load(json)</code></td>
 <td valign="top"><code>json: JSON</code></td>
-<td>Load a song into 8bit.js using JSON. Format is:<br>
+<td>Load a song into Band.js using JSON. Format is:<br>
 <pre>{
     timeSignature: [4, 4],
     tempo: 100,
