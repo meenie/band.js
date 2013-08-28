@@ -231,6 +231,6 @@ instrument pack if one is not specified.</td>
 </tr>
 </table>
 
-### Copyright and License
+### License
 
-Copyright 2013 Cody Lundquist under the [MIT License (MIT)](LICENSE).
+Copyright 2013 Cody Lundquist and various contributors. Released under the [MIT License (MIT)](LICENSE).
