@@ -1,0 +1,12 @@
+{
+  "name": "8bit.js",
+  "version": "0.1.0",
+  "main": "build/8bit.min.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "band",
+  "version": "0.2.0",
+  "description": "Band.js - Music Composer - An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex time signatures.",
+  "main": "src/band.js",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:meenie/band.js.git"
+  },
+  "author": "Cody Lundquist",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.2"
+  }
+}
