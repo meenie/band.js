@@ -32,8 +32,8 @@ Band.js - Music Composer
 <table>
 <tr>
 <th width="20%">Method</th>
-<th width="15%">Params</th>
-<th width="65%">Description</th>
+<th width="10%">Params</th>
+<th width="70%">Description</th>
 </tr>
 <tr>
 <td><code>constructor(tuning, rhythm)</code></td>
@@ -99,9 +99,14 @@ as it's default rhythm notation.</td>
 <td>Pass in true if you want the music to keep looping forever.</td>
 </tr>
 <tr>
-<td><code>createInstrument(waveForm)</code></td>
-<td><code>waveForm: sine</code></td>
-<td>Creates an instrument that you can add notes/rests with.  The possible instrument types are: <code>sine</code>, <code>square</code>, <code>sawtooth</code>, and <code>triangle</code></td>
+<td><code>createInstrument(name, pack)</code></td>
+<td>
+    <code>name: 'sine'</code><br>
+    <code>pack: 'oscillators'</code>
+</td>
+<td>Creates an instrument that you can add notes/rests with. The first argument is the name of the instrument and
+the second is which pack it should use for that instrument name.  By default BandJS uses the 'oscillators'
+instrument pack if one is not specified.</td>
 </tr>
 <tr>
 <td valign="top"><code>load(json)</code></td>
@@ -174,10 +179,10 @@ as it's default rhythm notation.</td>
 <th width="65%">Description</th>
 </tr>
 <tr>
-<td valign="top"><code>note(note, pitch, tie)</code></td>
-<td valign="top"><code>note</code> Must be set<br><code>pitch</code> optional<br><code>tie: false</code></td>
+<td valign="top"><code>note(rhythm, pitch, tie)</code></td>
+<td valign="top"><code>rhythm</code> Must be set<br><code>pitch</code> optional<br><code>tie: false</code></td>
 <td>Adds a note to the stack of notes for the particular instrument.<br>
-    If using North American notation, <code>note</code> can be any from the list below
+    If using North American notation, <code>rhythm</code> can be any from the list below
     <ul>
         <li>whole</li>
         <li>dottedHalf</li>
@@ -200,9 +205,9 @@ as it's default rhythm notation.</td>
 </td>
 </tr>
 <tr>
-<td><code>rest(note)</code></td>
-<td><code>note</code> Must be set</td>
-<td>Adds a rest to the list of notes.  Use the note list above for the type of rest you can use.</td>
+<td><code>rest(rhythm)</code></td>
+<td><code>rhythm</code> Must be set</td>
+<td>Adds a rest to the list of notes.  Use the rhythm list above for the type of rest you can use.</td>
 </tr>
 <tr>
 <td><code>setVolume(volume)</code></td>

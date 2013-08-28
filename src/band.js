@@ -162,14 +162,14 @@
                     /**
                      * Add a rest to an instrument
                      *
-                     * @param note
+                     * @param rhythm
                      */
-                    this.rest = function(note) {
-                        if (typeof notes[note] === 'undefined') {
-                            throw new Error(note + ' is not a correct rhythm.');
+                    this.rest = function(rhythm) {
+                        if (typeof notes[rhythm] === 'undefined') {
+                            throw new Error(rhythm + ' is not a correct rhythm.');
                         }
 
-                        var duration = getDuration(note);
+                        var duration = getDuration(rhythm);
 
                         notesBuffer.push({
                             pitch: false,
