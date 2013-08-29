@@ -25,6 +25,8 @@ Band.js - Music Composer
 #### Examples
 
 * [Super Mario Bros Theme](http://plnkr.co/edit/LG20SL?p=preview) - Created by me
+* [Tetris Theme](http://plnkr.co/edit/ZmsCCS?p=preview) - Created by [rooktakesqueen](http://www.reddit.com/user/rooktakesqueen)
+* [Zelda Main Theme](http://plnkr.co/edit/jFnos1?p=preview) - Created by [legosjedi](http://www.reddit.com/user/legosjedi)
 
 #### API
 
