@@ -18,7 +18,7 @@ BandJS.loadPack('instrument', 'noises', function(name, audioContext) {
         createSound: function(destination) {
             switch (name) {
                 case 'white':
-                    return createWhileNoise(destination);
+                    return createWhiteNoise(destination);
                 case 'pink':
                     return createPinkNoise(destination);
                 case 'brown':
@@ -29,7 +29,7 @@ BandJS.loadPack('instrument', 'noises', function(name, audioContext) {
         }
     };
 
-    function createWhileNoise(destination) {
+    function createWhiteNoise(destination) {
         var bufferSize = 2 * audioContext.sampleRate,
             noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate),
             output = noiseBuffer.getChannelData(0);
