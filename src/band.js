@@ -1,6 +1,7 @@
 /**
  * Band.js - Music Composer
- * An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex time signatures.
+ * An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex
+ * time signatures.
  *
  * @author Cody Lundquist (http://github.com/meenie) - 2013
  */
@@ -54,9 +55,13 @@
             currentPlayTime,
             totalPlayTime = 0,
             totalDuration = 0,
+            currentSeconds = 0,
+            tickerCallback,
             paused = false,
             playing = false,
             loop = false,
+            muted = false,
+            faded = false,
             onFinishedCallback,
             onFinished = function(cb) {
                 self.stop(false);
@@ -67,16 +72,14 @@
                 }
             },
             totalPlayTimeCalculator = function() {
-                setTimeout(function() {
-                    if (! paused && playing) {
-                        if (totalDuration < totalPlayTime) {
-                            onFinished(onFinishedCallback);
-                        } else {
-                            updateTotalPlayTime();
-                            totalPlayTimeCalculator();
-                        }
+                if (! paused && playing) {
+                    if (totalDuration < totalPlayTime) {
+                        onFinished(onFinishedCallback);
+                    } else {
+                        updateTotalPlayTime();
+                        requestAnimationFrame(totalPlayTimeCalculator);
                     }
-                }, 1);
+                }
             },
             /**
              * Instrument Class
@@ -341,18 +344,27 @@
          */
         this.stop = function(fadeOut) {
             playing = false;
+            currentSeconds = 0;
+
             if (typeof fadeOut === 'undefined') {
                 fadeOut = true;
             }
-            if (fadeOut) {
+            if (fadeOut && ! muted) {
                 fade('down', function() {
                     totalPlayTime = 0;
+                    // Reset the sound back to it's master volume level
+                    self.setMasterVolume(masterVolumeLevel);
                     reset();
-                    self.unmute();
+                    faded = false;
+                    tickerCallback(currentSeconds);
                 });
             } else {
                 totalPlayTime = 0;
                 reset();
+                // Make callback asynchronous
+                setTimeout(function() {
+                    tickerCallback(currentSeconds);
+                }, 1)
             }
         };
 
@@ -368,6 +380,7 @@
          * Mute all of the music
          */
         this.mute = function(cb) {
+            muted = true;
             fade('down', cb);
         };
 
@@ -375,7 +388,31 @@
          * Unmute all of the music
          */
         this.unmute = function(cb) {
+            muted = false;
             fade('up', cb);
+        };
+
+        /**
+         * Grab the total duration of a song
+         *
+         * @returns {number}
+         */
+        this.getTotalSeconds = function() {
+            return Math.round(totalDuration);
+        };
+
+        /**
+         * Sets the ticker callback function. This function will be called
+         * every time the current seconds has changed.
+         *
+         * @param cb function
+         */
+        this.setTicker = function (cb) {
+            if (typeof cb !== 'function') {
+                throw new Error('Ticker must be a function.');
+            }
+
+            tickerCallback = cb;
         };
 
         /**
@@ -462,7 +499,7 @@
             paused = false;
             // Starts calculator which keeps track of total play time
             currentPlayTime = ac.currentTime;
-            totalPlayTimeCalculator();
+            requestAnimationFrame(totalPlayTimeCalculator);
 
             var timeOffset = ac.currentTime - totalPlayTime;
             sounds.forEach(function(sound) {
@@ -475,7 +512,7 @@
                 node.stop(stopTime);
             });
 
-            if (totalPlayTime > 0) {
+            if (faded && ! muted) {
                 fade('up');
             }
         };
@@ -499,9 +536,13 @@
         this.pause = function() {
             paused = true;
             updateTotalPlayTime();
-            fade('down', function() {
+            if (muted) {
                 reset();
-            });
+            } else {
+                fade('down', function() {
+                    reset();
+                });
+            }
         };
 
         /**
@@ -511,6 +552,21 @@
          */
         this.loop = function(l) {
             loop = l;
+        };
+
+        /**
+         * Set a specific time that the song should start it.
+         * If it's already playing, reset and start the song
+         * again so it has a seamless jump.
+         *
+         * @param newTime
+         */
+        this.setTime = function(newTime) {
+            totalPlayTime = parseInt(newTime);
+            if (playing && ! paused) {
+                reset();
+                self.play();
+            }
         };
 
         // Default to 120 tempo
@@ -524,6 +580,14 @@
          */
         function updateTotalPlayTime() {
             totalPlayTime += ac.currentTime - currentPlayTime;
+            var seconds = Math.round(totalPlayTime);
+            if (seconds != currentSeconds) {
+                // Make callback asynchronous
+                setTimeout(function() {
+                    tickerCallback(seconds);
+                }, 1);
+                currentSeconds = seconds;
+            }
             currentPlayTime = ac.currentTime;
         }
 
@@ -557,24 +621,23 @@
             if ('up' !== direction && 'down' !== direction) {
                 throw new Error('Direction must be either up or down.');
             }
+            faded = direction === 'down';
             var i = 100 * masterVolumeLevel,
-                timeout = function() {
-                    setTimeout(function() {
-                        if (i > 0) {
-                            i = i - 2;
-                            i = i < 0 ? 0 : i;
-                            var gain = 'up' === direction ? masterVolumeLevel * 100 - i : i;
-                            masterVolume.gain.value = gain / 100;
-                            timeout();
-                        } else {
-                            if (typeof cb === 'function') {
-                                cb();
-                            }
+                fadeTimer = function() {
+                    if (i > 0) {
+                        i = i - 4;
+                        i = i < 0 ? 0 : i;
+                        var gain = 'up' === direction ? masterVolumeLevel * 100 - i : i;
+                        masterVolume.gain.value = gain / 100;
+                        requestAnimationFrame(fadeTimer);
+                    } else {
+                        if (typeof cb === 'function') {
+                            cb();
                         }
-                    }, 1);
+                    }
                 };
 
-            timeout();
+            requestAnimationFrame(fadeTimer);
         }
     }
 
@@ -612,6 +675,11 @@
 
         return copy;
     }
+
+    var requestAnimationFrame = this.requestAnimationFrame || this.mozRequestAnimationFrame ||
+        this.webkitRequestAnimationFrame || this.msRequestAnimationFrame;
+
+    this.requestAnimationFrame = requestAnimationFrame;
 
     // Export for CommonJS
     if (typeof module === 'object' && module && typeof module.exports === 'object' ) {
