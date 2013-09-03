@@ -451,14 +451,18 @@
                         sounds.push({
                             startTime: startTime,
                             stopTime: stopTime,
-                            node: instrument.createSound(volume)
+                            instrument: instrument,
+                            destination: volume,
+                            pitch: false
                         });
                     } else {
                         pitch.forEach(function(p) {
                             sounds.push({
                                 startTime: startTime,
                                 stopTime: stopTime,
-                                node: instrument.createSound(volume, pitches[p.trim()])
+                                instrument: instrument,
+                                destination: volume,
+                                pitch: pitches[p.trim()]
                             });
                         });
                     }
@@ -503,13 +507,19 @@
 
             var timeOffset = ac.currentTime - totalPlayTime;
             sounds.forEach(function(sound) {
-                var node = sound.node,
+                var instrument = sound.instrument,
                     startTime = sound.startTime + timeOffset,
-                    stopTime = sound.stopTime + timeOffset
+                    stopTime = sound.stopTime + timeOffset,
+                    destination = sound.destination,
+                    pitch = sound.pitch
                 ;
 
-                node.start(startTime);
-                node.stop(stopTime);
+                if (startTime > ac.currentTime) {
+                    sound.node = instrument.createSound(destination, pitch);
+                    sound.node.start(startTime);
+                    sound.node.stop(stopTime);
+                }
+
             });
 
             if (faded && ! muted) {
@@ -606,7 +616,9 @@
          */
         function reset() {
             sounds.forEach(function(sound) {
-                sound.node.stop(0);
+                if (sound.node) {
+                    sound.node.stop(0);
+                }
             });
             self.end();
         }

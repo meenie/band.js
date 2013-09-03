@@ -470,6 +470,12 @@ app.controller('AppController', function($scope) {
         .note('quarter', 'C3')
         .rest('quarter');
 
+    drum.rest('whole');
+
+    rightHand.repeatFromBeginning(20);
+    leftHand.repeatFromBeginning(20);
+    drum.repeatFromBeginning(20);
+
     rightHand.finish();
     leftHand.finish();
     drum.setVolume(10).finish();
