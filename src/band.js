@@ -51,11 +51,13 @@
             notes = packs.rhythm[rhythm],
             tempo,
             instruments = [],
-            sounds = [],
+            allSounds = [],
             currentPlayTime,
             totalPlayTime = 0,
             totalDuration = 0,
             currentSeconds = 0,
+            defaultBufferSize = 50,
+            bufferTimeout,
             tickerCallback,
             paused = false,
             playing = false,
@@ -107,7 +109,7 @@
                         currentTime = 0,
                         lastRepeatCount = 0,
                         volumeLevel = 0.25,
-                        notesBuffer = [],
+                        soundsBuffer = [],
                         instrument = packs.instrument[pack](name, ac)
                     ;
 
@@ -149,7 +151,7 @@
                             });
                         }
 
-                        notesBuffer.push({
+                        soundsBuffer.push({
                             pitch: pitch,
                             duration: duration,
                             articulationGap: articulationGap,
@@ -174,7 +176,7 @@
 
                         var duration = getDuration(rhythm);
 
-                        notesBuffer.push({
+                        soundsBuffer.push({
                             pitch: false,
                             duration: duration,
                             articulationGap: 0,
@@ -191,7 +193,7 @@
                      * Place where a repeat section should start
                      */
                     this.repeatStart = function() {
-                        lastRepeatCount = notesBuffer.length;
+                        lastRepeatCount = soundsBuffer.length;
 
                         return self;
                     };
@@ -212,16 +214,16 @@
                      */
                     this.repeat = function(numOfRepeats) {
                         numOfRepeats = typeof numOfRepeats === 'undefined' ? 1 : numOfRepeats;
-                        var copyNotesBuffer = notesBuffer.slice(lastRepeatCount);
+                        var soundsBufferCopy = soundsBuffer.slice(lastRepeatCount);
                         for (var r = 0; r < numOfRepeats; r++) {
-                            copyNotesBuffer.forEach(function(note) {
-                                var noteCopy = clone(note);
+                            soundsBufferCopy.forEach(function(sound) {
+                                var soundCopy = clone(sound);
 
-                                noteCopy.startTime = currentTime;
-                                noteCopy.stopTime = currentTime + noteCopy.duration - noteCopy.articulationGap;
+                                soundCopy.startTime = currentTime;
+                                soundCopy.stopTime = currentTime + soundCopy.duration - soundCopy.articulationGap;
 
-                                notesBuffer.push(noteCopy);
-                                currentTime += noteCopy.duration;
+                                soundsBuffer.push(soundCopy);
+                                currentTime += soundCopy.duration;
                             });
                         }
 
@@ -233,13 +235,18 @@
                      * of each instrument.
                      */
                     this.finish = function() {
-                        var totalDuration = 0;
-                        notesBuffer.forEach(function(note) {
-                            totalDuration += note.duration;
+                        var duration = 0;
+                        soundsBuffer.forEach(function(sound) {
+                            duration += sound.duration;
                         });
+                        // Figure out longest duration out of all the instruments
+                        if (duration > totalDuration) {
+                            totalDuration = duration;
+                        }
                         instruments.push({
                             instrument: instrument,
-                            notes: notesBuffer,
+                            sounds: soundsBuffer,
+                            bufferPosition: 0,
                             totalDuration: totalDuration,
                             volumeLevel: volumeLevel
                         });
@@ -340,7 +347,9 @@
         };
 
         /**
-         * Stop playing all music and reset the Oscillators
+         * Stop playing all music and reset the song
+         *
+         * @param fadeOut boolean - should the song fade out?
          */
         this.stop = function(fadeOut) {
             playing = false;
@@ -352,19 +361,19 @@
             if (fadeOut && ! muted) {
                 fade('down', function() {
                     totalPlayTime = 0;
-                    // Reset the sound back to it's master volume level
-                    self.setMasterVolume(masterVolumeLevel);
                     reset();
-                    faded = false;
-                    tickerCallback(currentSeconds);
-                });
+                    // Make callback asynchronous
+                    setTimeout(function() {
+                        tickerCallback(currentSeconds);
+                    }, 1);
+                }, true);
             } else {
                 totalPlayTime = 0;
                 reset();
                 // Make callback asynchronous
                 setTimeout(function() {
                     tickerCallback(currentSeconds);
-                }, 1)
+                }, 1);
             }
         };
 
@@ -372,6 +381,9 @@
          * Set Master Volume
          */
         this.setMasterVolume = function(newVolume) {
+            if (newVolume > 1) {
+                newVolume = newVolume / 100;
+            }
             masterVolumeLevel = newVolume;
             masterVolume.gain.value = masterVolumeLevel;
         };
@@ -416,58 +428,82 @@
         };
 
         /**
-         * Create all the sound nodes
+         * Needs to be called after all the instruments have been marked off as
+         * finished.
+         *
+         * Buffers up the initial sounds so they can be instantly played.
          */
         this.end = function() {
-            sounds = [];
-            totalDuration = 0;
-            for (var i = 0; i < instruments.length; i++) {
-                // Find the highest duration of all of the instruments
-                if (totalDuration < instruments[i].totalDuration) {
-                    totalDuration = instruments[i].totalDuration;
-                }
+            // Reset the buffer position of all instruments
+            instruments.forEach(function(instrument) {
+                instrument.bufferPosition = 0;
+            });
+            // Setup initials sounds
+            allSounds = this.bufferSounds();
+        };
 
-                var theseNotes = instruments[i].notes,
-                    instrument = instruments[i].instrument,
-                    // Create volume for this instrument
-                    volume = ac.createGain();
+        /**
+         * Grabs a set of sounds based on the current time and what the Buffer Size is.
+         * It will also skip any sounds that have a start time less than the
+         * total play time.
+         */
+        this.bufferSounds = function(bufferSize) {
+            // Default buffer amount to 50 notes
+            if (! bufferSize) {
+                bufferSize = defaultBufferSize;
+            }
+
+            var sounds = [];
+            instruments.forEach(function(instrument) {
+                // Create volume for this instrument
+                var volume = ac.createGain(),
+                    bufferCount = bufferSize;
 
                 // Connect volume gain to the Master Volume;
                 volume.connect(masterVolume);
                 // Set the volume for this note
-                volume.gain.value = instruments[i].volumeLevel;
+                volume.gain.value = instrument.volumeLevel;
 
-                for (var ii = 0; ii < theseNotes.length; ii++) {
-                    var pitch = theseNotes[ii].pitch,
-                        startTime = theseNotes[ii].startTime,
-                        stopTime = theseNotes[ii].stopTime
+                for (var i = 0; i < bufferCount; i++) {
+                    var sound = instrument.sounds[instrument.bufferPosition + i];
 
-                    // If pitch is false, then it's a rest and we don't need a sound
-                    if (false === pitch) {
+                    if (typeof sound === 'undefined') {
+                        break;
+                    }
+
+                    var pitch = sound.pitch,
+                        startTime = sound.startTime,
+                        stopTime = sound.stopTime;
+
+                    if (startTime < totalPlayTime) {
+                        bufferCount++;
                         continue;
                     }
 
-                    if (typeof pitch === 'undefined') {
-                        sounds.push({
-                            startTime: startTime,
-                            stopTime: stopTime,
-                            instrument: instrument,
-                            destination: volume,
-                            pitch: false
-                        });
-                    } else {
-                        pitch.forEach(function(p) {
+                    // If pitch is false, then it's a rest and we don't need a sound
+                    if (false !== pitch) {
+                        if (typeof pitch === 'undefined') {
                             sounds.push({
                                 startTime: startTime,
                                 stopTime: stopTime,
-                                instrument: instrument,
-                                destination: volume,
-                                pitch: pitches[p.trim()]
+                                node: instrument.instrument.createSound(volume)
                             });
-                        });
+                        } else {
+                            pitch.forEach(function(p) {
+                                sounds.push({
+                                    startTime: startTime,
+                                    stopTime: stopTime,
+                                    node: instrument.instrument.createSound(volume, pitches[p.trim()])
+                                });
+                            });
+                        }
                     }
                 }
-            }
+                instrument.bufferPosition += bufferCount;
+            });
+
+            // Return array of sounds
+            return sounds;
         };
 
         /**
@@ -495,7 +531,11 @@
         };
 
         /**
-         * Grabs all the sound nodes and start()/stop()'s them
+         * Grabs currently buffered sound nodes and calls their start/stop methods.
+         *
+         * It then sets up a timer to buffer up the next set of notes based on the
+         * a set buffer size.  This will keep going until the song is stopped or paused.
+         *
          * It will use the total time played so far as an offset so you pause/play the music
          */
         this.play = function() {
@@ -503,24 +543,33 @@
             paused = false;
             // Starts calculator which keeps track of total play time
             currentPlayTime = ac.currentTime;
-            requestAnimationFrame(totalPlayTimeCalculator);
+            totalPlayTimeCalculator();
+            var timeOffset = ac.currentTime - totalPlayTime,
+                playSounds = function(sounds) {
+                    sounds.forEach(function(sound) {
+                        var startTime = sound.startTime + timeOffset,
+                            stopTime = sound.stopTime + timeOffset;
+                        ;
 
-            var timeOffset = ac.currentTime - totalPlayTime;
-            sounds.forEach(function(sound) {
-                var instrument = sound.instrument,
-                    startTime = sound.startTime + timeOffset,
-                    stopTime = sound.stopTime + timeOffset,
-                    destination = sound.destination,
-                    pitch = sound.pitch
-                ;
+                        sound.node.start(startTime);
+                        sound.node.stop(stopTime);
+                    });
+                },
+                bufferUp = function() {
+                    bufferTimeout = setTimeout(function() {
+                        if (playing & ! paused) {
+                            var newSounds = self.bufferSounds();
+                            if (newSounds.length > 0) {
+                                playSounds(newSounds);
+                                allSounds = allSounds.concat(newSounds);
+                                bufferUp();
+                            }
+                        }
+                    }, 5000);
+                };
 
-                if (startTime > ac.currentTime) {
-                    sound.node = instrument.createSound(destination, pitch);
-                    sound.node.start(startTime);
-                    sound.node.stop(stopTime);
-                }
-
-            });
+            playSounds(allSounds);
+            bufferUp();
 
             if (faded && ! muted) {
                 fade('up');
@@ -541,7 +590,8 @@
         };
 
         /**
-         * Pauses the music, resets the sound nodes, gets the total time played so far
+         * Pauses the music, resets the sound nodes,
+         * and gets the total time played so far
          */
         this.pause = function() {
             paused = true;
@@ -573,8 +623,8 @@
          */
         this.setTime = function(newTime) {
             totalPlayTime = parseInt(newTime);
+            reset();
             if (playing && ! paused) {
-                reset();
                 self.play();
             }
         };
@@ -612,10 +662,12 @@
         }
 
         /**
-         * Helper function to stop all sound nodes and recreate them
+         * Helper function to stop all sound nodes
+         * then call self.end() to re-buffer them
          */
         function reset() {
-            sounds.forEach(function(sound) {
+            clearTimeout(bufferTimeout);
+            allSounds.forEach(function(sound) {
                 if (sound.node) {
                     sound.node.stop(0);
                 }
@@ -628,8 +680,12 @@
          *
          * @param direction - up or down
          * @param [cb] - Callback function fired after the transition is completed
+         * @param [resetVolume] - Reset the volume back to it's original level
          */
-        function fade(direction, cb) {
+        function fade(direction, cb, resetVolume) {
+            if (typeof resetVolume === 'undefined') {
+                resetVolume = false;
+            }
             if ('up' !== direction && 'down' !== direction) {
                 throw new Error('Direction must be either up or down.');
             }
@@ -646,10 +702,15 @@
                         if (typeof cb === 'function') {
                             cb();
                         }
+
+                        if (resetVolume) {
+                            faded = ! faded;
+                            masterVolume.gain.value = masterVolumeLevel;
+                        }
                     }
                 };
 
-            requestAnimationFrame(fadeTimer);
+            fadeTimer();
         }
     }
 
