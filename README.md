@@ -12,10 +12,10 @@ Band.js - Music Composer
 6. Start adding notes:
 
     ```javascript
-    piano.note('C4', 'quarter');
-    piano.note('D4', 'quarter');
-    piano.note('E4', 'quarter');
-    piano.note('F4', 'quarter');
+    piano.note('quarter', 'C4');
+    piano.note('quarter', 'D4');
+    piano.note('quarter', 'E4');
+    piano.note('quarter', 'F4');
     ```
     
 7. Mark the `piano` instrument as finished: `piano.finish();`
