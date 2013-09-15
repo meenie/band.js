@@ -472,9 +472,9 @@ app.controller('AppController', function($scope) {
 
     drum.rest('whole');
 
-    rightHand.repeatFromBeginning(20);
-    leftHand.repeatFromBeginning(20);
-    drum.repeatFromBeginning(20);
+    rightHand.repeatFromBeginning(2000);
+    leftHand.repeatFromBeginning(2000);
+    drum.repeatFromBeginning(2000);
 
     rightHand.finish();
     leftHand.finish();
@@ -559,7 +559,12 @@ app.filter('musicTime', function() {
     return function(seconds, showRemaining) {
         var duration = moment.duration(parseInt(seconds), 'seconds'),
             secs = duration.seconds(),
-            mins = duration.minutes();
+            mins = duration.minutes(),
+            hrs = duration.hours();
+
+        if (hrs > 0) {
+            mins += (hrs * 60);
+        }
 
         return mins + ':' + pad(secs, 2);
     }
