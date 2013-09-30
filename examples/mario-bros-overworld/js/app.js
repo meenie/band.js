@@ -9,6 +9,8 @@ app.controller('AppController', function($scope) {
         leftHand = gameMusic.createInstrument('triangle', 'oscillators'),
         drum = gameMusic.createInstrument('white', 'noises');
 
+    drum.setVolume(50);
+
     /**
      * Intro
      */
@@ -478,7 +480,7 @@ app.controller('AppController', function($scope) {
 
     rightHand.finish();
     leftHand.finish();
-    drum.setVolume(10).finish();
+    drum.finish();
 
     gameMusic.end();
 

@@ -108,7 +108,7 @@
                     var self = this,
                         currentTime = 0,
                         lastRepeatCount = 0,
-                        volumeLevel = 0.25,
+                        volumeLevel = 1,
                         soundsBuffer = [],
                         instrument = packs.instrument[pack](name, ac)
                     ;
@@ -139,7 +139,7 @@
                         }
 
                         var duration = getDuration(rhythm),
-                            articulationGap = tie ? 0 : duration * 0.1;
+                            articulationGap = tie ? 0 : duration * 0.05;
 
                         if (pitch) {
                             pitch = pitch.split(',');
@@ -155,7 +155,10 @@
                             pitch: pitch,
                             duration: duration,
                             articulationGap: articulationGap,
+                            tie: tie,
                             startTime: currentTime,
+                            // Volume needs to be a quarter of the master so it doesn't clip
+                            volumeLevel: volumeLevel / 4,
                             stopTime: currentTime + duration - articulationGap
                         });
 
@@ -247,8 +250,7 @@
                             instrument: instrument,
                             sounds: soundsBuffer,
                             bufferPosition: 0,
-                            totalDuration: totalDuration,
-                            volumeLevel: volumeLevel
+                            totalDuration: totalDuration
                         });
                     };
                 }
@@ -306,29 +308,29 @@
             }
 
             // Now lets add in each of the notes
-            for (var instrument in json['notes']) {
-                if (! json['notes'].hasOwnProperty(instrument)) {
+            for (var inst in json['notes']) {
+                if (! json['notes'].hasOwnProperty(inst)) {
                     continue;
                 }
-                json['notes'][instrument].forEach(function(note) {
+                json['notes'][inst].forEach(function(note) {
                     // Use shorthand if it's a string
                     if (typeof note === 'string') {
                         var noteParts = note.split('|');
                         if ('rest' === noteParts[1]) {
-                            instrumentList[instrument].rest(noteParts[0]);
+                            instrumentList[inst].rest(noteParts[0]);
                         } else {
-                            instrumentList[instrument].note(noteParts[0], noteParts[1], noteParts[2]);
+                            instrumentList[inst].note(noteParts[0], noteParts[1], noteParts[2]);
                         }
                     // Otherwise use longhand
                     } else {
                         if ('rest' === note.type) {
-                            instrumentList[instrument].rest(note.rhythm);
+                            instrumentList[inst].rest(note.rhythm);
                         } else if ('note' === note.type) {
-                            instrumentList[instrument].note(note.rhythm, note.pitch, note.tie);
+                            instrumentList[inst].note(note.rhythm, note.pitch, note.tie);
                         }
                     }
                 });
-                instrumentList[instrument].finish();
+                instrumentList[inst].finish();
             }
 
             // Looks like we are done, lets press it.
@@ -456,13 +458,7 @@
             var sounds = [];
             instruments.forEach(function(instrument) {
                 // Create volume for this instrument
-                var volume = ac.createGain(),
-                    bufferCount = bufferSize;
-
-                // Connect volume gain to the Master Volume;
-                volume.connect(masterVolume);
-                // Set the volume for this note
-                volume.gain.value = instrument.volumeLevel;
+                var bufferCount = bufferSize;
 
                 for (var i = 0; i < bufferCount; i++) {
                     var sound = instrument.sounds[instrument.bufferPosition + i];
@@ -473,7 +469,8 @@
 
                     var pitch = sound.pitch,
                         startTime = sound.startTime,
-                        stopTime = sound.stopTime;
+                        stopTime = sound.stopTime,
+                        volumeLevel = sound.volumeLevel;
 
                     if (startTime < totalPlayTime) {
                         bufferCount++;
@@ -482,18 +479,27 @@
 
                     // If pitch is false, then it's a rest and we don't need a sound
                     if (false !== pitch) {
+                        var gain = ac.createGain();
+                        // Connect volume gain to the Master Volume;
+                        gain.connect(masterVolume);
+                        gain.gain.value = volumeLevel;
+
                         if (typeof pitch === 'undefined') {
                             sounds.push({
                                 startTime: startTime,
                                 stopTime: stopTime,
-                                node: instrument.instrument.createSound(volume)
+                                node: instrument.instrument.createSound(gain),
+                                gain: gain,
+                                volumeLevel: volumeLevel
                             });
                         } else {
                             pitch.forEach(function(p) {
                                 sounds.push({
                                     startTime: startTime,
                                     stopTime: stopTime,
-                                    node: instrument.instrument.createSound(volume, pitches[p.trim()])
+                                    node: instrument.instrument.createSound(gain, pitches[p.trim()]),
+                                    gain: gain,
+                                    volumeLevel: volumeLevel
                                 });
                             });
                         }
@@ -548,8 +554,22 @@
                 playSounds = function(sounds) {
                     sounds.forEach(function(sound) {
                         var startTime = sound.startTime + timeOffset,
-                            stopTime = sound.stopTime + timeOffset;
+                            stopTime = sound.stopTime + timeOffset
                         ;
+
+                        /**
+                         * If no tie, then we need to introduce a volume ramp up to remove any clipping
+                         * as Oscillators have an issue with this when playing a note at full volume.
+                         * We also put in a slight ramp down as well.  This only takes up 1/1000 of a second.
+                         */
+                        if (! sound.tie) {
+                            startTime -= 0.001;
+                            stopTime += 0.001;
+                            sound.gain.gain.setValueAtTime(0.0, startTime);
+                            sound.gain.gain.linearRampToValueAtTime(sound.volumeLevel, startTime + 0.001);
+                            sound.gain.gain.setValueAtTime(sound.volumeLevel, stopTime - 0.001);
+                            sound.gain.gain.linearRampToValueAtTime(0.0, stopTime);
+                        }
 
                         sound.node.start(startTime);
                         sound.node.stop(stopTime);
