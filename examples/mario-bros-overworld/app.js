@@ -485,7 +485,7 @@ app.controller('AppController', function($scope) {
     gameMusic.end();
 
     $scope.playing = $scope.paused = $scope.muted = false;
-    $scope.volume = 100;
+    $scope.volume = 50;
     $scope.currentSeconds = 0;
     $scope.timeSlider = 0;
     $scope.totalSeconds = gameMusic.getTotalSeconds();

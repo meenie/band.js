@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Super Mario Bros Overworld</title>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/app.css" rel="stylesheet">
+    <link href="app.css" rel="stylesheet">
     <script src="http://code.angularjs.org/1.2.0rc1/angular.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.5.0/ui-bootstrap-tpls.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.1.0/moment.min.js"></script>
@@ -18,24 +18,31 @@
     <script src="../../src/tuning-packs/equal-temperament.js"></script>
 
     <!-- App Files -->
-    <script src="js/app.js"></script>
+    <script src="app.js"></script>
 </head>
 <body ng-controller="AppController">
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
-                <h4><strong>Only works in latest chrome or safari!</strong></h4>
+            <div class="col-xs-12 text-center">
+                <h3><strong>Super Mario Bros Overworld Theme</strong></h3>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h2>{{currentSeconds|musicTime}}</h2>
+        <div class="row" ng-cloak>
+            <div class="col-lg-10 col-lg-offset-1">
+                <div class="row timing">
+                    <div class="col-xs-12 text-center">
+                        <span class="music-time">{{currentSeconds|musicTime}}</span>
+                        <input ng-mousedown="movingTime()" ng-mouseup="updateTime()" type="range" max="{{totalSeconds}}" ng-model="currentSeconds">
+                        <span class="music-time">{{totalSeconds|musicTime}}</span>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12 text-center">
+                <div class="row cover-art">
+                    <div class="col-xs-12 text-center">
+                        <img src="http://i.imgur.com/oc4m2Z7.png" alt="Super Mario Bros">
+                    </div>
+                </div>
+                <div class="row controls">
+                    <div class="col-xs-12 text-center">
                         <div class="btn-group">
                             <button ng-if="! playing || paused" ng-click="play()" class="btn btn-default"><i class="glyphicon glyphicon-play"></i></button>
                             <button ng-if="! paused && playing" ng-click="pause()" class="btn btn-default"><i class="glyphicon glyphicon-pause"></i></button>
@@ -45,18 +52,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <input ng-mousedown="movingTime()" ng-mouseup="updateTime()" type="range" max="{{totalSeconds}}" ng-model="currentSeconds">
-                        <span class="total-time">{{totalSeconds|musicTime}}</span>
+                <div class="row volume">
+                    <div class="col-xs-12 text-center">
+                        <input ng-disabled="muted" type="range" ng-model="volume">
                     </div>
                 </div>
             </div>
-            <div class="col-md-8">
-                <input ng-disabled="muted" class="vertical-range" type="range" ng-model="volume">
+        </div>
+        <div class="row">
+            <div class="col-xs-12 text-center">
+                <h6>Only works in latest chrome or safari!</h6>
             </div>
         </div>
-
     </div>
 </body>
 </html>
