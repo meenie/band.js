@@ -9,6 +9,8 @@ app.controller('AppController', function($scope) {
         leftHand = gameMusic.createInstrument('triangle', 'oscillators'),
         drum = gameMusic.createInstrument('white', 'noises');
 
+    drum.setVolume(50);
+
     /**
      * Intro
      */
@@ -470,14 +472,20 @@ app.controller('AppController', function($scope) {
         .note('quarter', 'C3')
         .rest('quarter');
 
+    drum.rest('whole');
+
+    rightHand.repeatFromBeginning(2000);
+    leftHand.repeatFromBeginning(2000);
+    drum.repeatFromBeginning(2000);
+
     rightHand.finish();
     leftHand.finish();
-    drum.setVolume(10).finish();
+    drum.finish();
 
     gameMusic.end();
 
     $scope.playing = $scope.paused = $scope.muted = false;
-    $scope.volume = 100;
+    $scope.volume = 50;
     $scope.currentSeconds = 0;
     $scope.timeSlider = 0;
     $scope.totalSeconds = gameMusic.getTotalSeconds();
@@ -553,7 +561,12 @@ app.filter('musicTime', function() {
     return function(seconds, showRemaining) {
         var duration = moment.duration(parseInt(seconds), 'seconds'),
             secs = duration.seconds(),
-            mins = duration.minutes();
+            mins = duration.minutes(),
+            hrs = duration.hours();
+
+        if (hrs > 0) {
+            mins += (hrs * 60);
+        }
 
         return mins + ':' + pad(secs, 2);
     }
