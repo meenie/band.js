@@ -273,6 +273,8 @@
          * @param json
          */
         this.load = function(json) {
+            this.destroy();
+
             if (! json) {
                 throw new Error('JSON is required for this method to work.');
             }
@@ -349,7 +351,7 @@
         };
 
         /**
-         * Stop playing all music and reset the song
+         * Stop playing all music and rewind the song
          *
          * @param fadeOut boolean - should the song fade out?
          */
@@ -378,6 +380,14 @@
                 }, 1);
             }
         };
+
+        /**
+         * Stop playing all music and destroy all instruments and notes
+         */
+        this.destroy = function() {
+          this.stop(false);
+          instruments = [];
+        }
 
         /**
          * Set Master Volume
