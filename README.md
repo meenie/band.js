@@ -72,6 +72,11 @@ as it's default rhythm notation.</td>
 <td>Stop the music with a slight fade out.  If you don't want the fade, pass in false.</td>
 </tr>
 <tr>
+<td><code>destroy()</code></td>
+<td>n/a</td>
+<td>Stop the music and destroy all the instruments and notes.</td>
+</tr>
+<tr>
 <td><code>play()</code></td>
 <td>n/a</td>
 <td>Play the music.</td>
