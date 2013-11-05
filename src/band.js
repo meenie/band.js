@@ -386,6 +386,7 @@
          */
         this.destroy = function() {
           this.stop(false);
+          totalDuration = 0;
           instruments = [];
         }
 
