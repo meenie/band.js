@@ -146,7 +146,10 @@
                             pitch.forEach(function(p) {
                                 p = p.trim();
                                 if (typeof pitches[p] === 'undefined') {
-                                    throw new Error(p + ' is not a valid pitch.');
+                                    p = parseFloat(p);
+                                    if (isNaN(p) || p < 0) {
+                                        throw new Error(p + ' is not a valid pitch.');
+                                    }
                                 }
                             });
                         }
@@ -497,7 +500,7 @@
                                 sounds.push({
                                     startTime: startTime,
                                     stopTime: stopTime,
-                                    node: instrument.instrument.createSound(gain, pitches[p.trim()]),
+                                    node: instrument.instrument.createSound(gain, pitches[p.trim()] || parseFloat(p)),
                                     gain: gain,
                                     volumeLevel: volumeLevel
                                 });
