@@ -143,7 +143,9 @@
 
                         if (pitch) {
                             pitch = pitch.split(',');
-                            pitch.forEach(function(p) {
+                            var index = -1;
+                            while (++index < pitch.length) {
+                                var p = pitch[index];
                                 p = p.trim();
                                 if (typeof pitches[p] === 'undefined') {
                                     p = parseFloat(p);
@@ -151,7 +153,7 @@
                                         throw new Error(p + ' is not a valid pitch.');
                                     }
                                 }
-                            });
+                            }
                         }
 
                         soundsBuffer.push({
@@ -222,15 +224,16 @@
                         numOfRepeats = typeof numOfRepeats === 'undefined' ? 1 : numOfRepeats;
                         var soundsBufferCopy = soundsBuffer.slice(lastRepeatCount);
                         for (var r = 0; r < numOfRepeats; r++) {
-                            soundsBufferCopy.forEach(function(sound) {
-                                var soundCopy = clone(sound);
+                            var index = -1;
+                            while (++index < soundsBufferCopy.length) {
+                                var soundCopy = clone(soundsBufferCopy[index]);
 
                                 soundCopy.startTime = currentTime;
                                 soundCopy.stopTime = currentTime + soundCopy.duration - soundCopy.articulationGap;
 
                                 soundsBuffer.push(soundCopy);
                                 currentTime += soundCopy.duration;
-                            });
+                            }
                         }
 
                         return self;
@@ -241,10 +244,12 @@
                      * of each instrument.
                      */
                     this.finish = function() {
-                        var duration = 0;
-                        soundsBuffer.forEach(function(sound) {
+                        var duration = 0,
+                            index = -1;
+                        while (++index < soundsBuffer.length) {
+                            var sound = soundsBuffer[index];
                             duration += sound.duration;
-                        });
+                        }
                         // Figure out longest duration out of all the instruments
                         if (duration > totalDuration) {
                             totalDuration = duration;
@@ -317,7 +322,9 @@
                 if (! json['notes'].hasOwnProperty(inst)) {
                     continue;
                 }
-                json['notes'][inst].forEach(function(note) {
+                var index = -1;
+                while (++index < json['notes'][inst].length) {
+                    var note = json['notes'][inst][index];
                     // Use shorthand if it's a string
                     if (typeof note === 'string') {
                         var noteParts = note.split('|');
@@ -326,7 +333,7 @@
                         } else {
                             instrumentList[inst].note(noteParts[0], noteParts[1], noteParts[2]);
                         }
-                    // Otherwise use longhand
+                        // Otherwise use longhand
                     } else {
                         if ('rest' === note.type) {
                             instrumentList[inst].rest(note.rhythm);
@@ -334,7 +341,7 @@
                             instrumentList[inst].note(note.rhythm, note.pitch, note.tie);
                         }
                     }
-                });
+                }
                 instrumentList[inst].finish();
             }
 
@@ -451,9 +458,10 @@
          */
         this.end = function() {
             // Reset the buffer position of all instruments
-            instruments.forEach(function(instrument) {
-                instrument.bufferPosition = 0;
-            });
+            var index = -1;
+            while (++index < instruments.length) {
+                instruments[index].bufferPosition = 0;
+            }
             // Setup initials sounds
             allSounds = this.bufferSounds();
         };
@@ -470,12 +478,14 @@
             }
 
             var sounds = [];
-            instruments.forEach(function(instrument) {
+            var index = -1;
+            while (++index < instruments.length) {
+                var instrument = instruments[index];
                 // Create volume for this instrument
                 var bufferCount = bufferSize;
-
-                for (var i = 0; i < bufferCount; i++) {
-                    var sound = instrument.sounds[instrument.bufferPosition + i];
+                var index2 = -1;
+                while (++index2 < bufferCount) {
+                    var sound = instrument.sounds[instrument.bufferPosition + index2];
 
                     if (typeof sound === 'undefined') {
                         break;
@@ -507,7 +517,9 @@
                                 volumeLevel: volumeLevel
                             });
                         } else {
-                            pitch.forEach(function(p) {
+                            var index3 = -1;
+                            while (++index3 < pitch.length) {
+                                var p = pitch[index3];
                                 sounds.push({
                                     startTime: startTime,
                                     stopTime: stopTime,
@@ -515,12 +527,12 @@
                                     gain: gain,
                                     volumeLevel: volumeLevel
                                 });
-                            });
+                            }
                         }
                     }
                 }
                 instrument.bufferPosition += bufferCount;
-            });
+            }
 
             // Return array of sounds
             return sounds;
@@ -566,10 +578,11 @@
             totalPlayTimeCalculator();
             var timeOffset = ac.currentTime - totalPlayTime,
                 playSounds = function(sounds) {
-                    sounds.forEach(function(sound) {
+                    var index = -1;
+                    while (++index < sounds.length) {
+                        var sound = sounds[index];
                         var startTime = sound.startTime + timeOffset,
-                            stopTime = sound.stopTime + timeOffset
-                        ;
+                            stopTime = sound.stopTime + timeOffset;
 
                         /**
                          * If no tie, then we need to introduce a volume ramp up to remove any clipping
@@ -587,7 +600,7 @@
 
                         sound.node.start(startTime);
                         sound.node.stop(stopTime);
-                    });
+                    }
                 },
                 bufferUp = function() {
                     bufferTimeout = setTimeout(function() {
@@ -701,11 +714,10 @@
          */
         function reset() {
             clearTimeout(bufferTimeout);
-            allSounds.forEach(function(sound) {
-                if (sound.node) {
-                    sound.node.stop(0);
-                }
-            });
+            var index = -1;
+            while (++index < allSounds.length) {
+                allSounds[index].gain.disconnect();
+            }
             self.end();
         }
 
