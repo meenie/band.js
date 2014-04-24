@@ -397,7 +397,7 @@
         this.destroy = function() {
           this.stop(false);
           totalDuration = 0;
-          instruments = [];
+          instruments.length = 0;
         }
 
         /**
