@@ -257,6 +257,13 @@
         // Setup master volume and connect to the context
         masterVolume.gain.value = 1;
         masterVolume.connect(ac.destination);
+        
+        this.get = function(key) {
+			switch(key) {
+				case 'playing':
+					return playing;
+			}
+		};
 
         /**
          * Use JSON to load in a song to be played
