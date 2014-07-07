@@ -1,7 +1,7 @@
 {
-  "name": "band.js",
-  "version": "0.3.1",
-  "main": "build/band.min.js",
+  "name": "BandJS",
+  "version": "1.0.0",
+  "main": "dist/band.min.js",
   "ignore": [
     "**/.*",
     "node_modules",

@@ -1,7 +1,23 @@
 /**
- * Oscillator Instrument Pack,
+ * Band.js - Music Composer
+ * An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex
+ * time signatures.
+ *
+ * @author Cody Lundquist (http://github.com/meenie) - 2014
  */
-BandJS.loadPack('instrument', 'noises', function(name, audioContext) {
+module.exports = NoisesInstrumentPack;
+
+/**
+ * Noises Instrument Pack
+ *
+ * Adapted from: https://github.com/zacharydenton/noise.js
+ *
+ * @param name
+ * @param audioContext
+ * @returns {{createSound: createSound}}
+ * @constructor
+ */
+function NoisesInstrumentPack(name, audioContext) {
     var types = [
         'white',
         'pink',
@@ -95,4 +111,4 @@ BandJS.loadPack('instrument', 'noises', function(name, audioContext) {
 
         return brownianNoise;
     }
-});
+}

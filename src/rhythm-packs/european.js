@@ -1,7 +1,15 @@
 /**
- * European rhythm names
+ * Band.js - Music Composer
+ * An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex
+ * time signatures.
+ *
+ * @author Cody Lundquist (http://github.com/meenie) - 2014
  */
-BandJS.loadPack('rhythm', 'european', {
+
+/**
+ * European Rhythm Pack
+ */
+module.exports = {
     semibreve: 1,
     dottedMinim: 0.75,
     minim: 0.5,
@@ -16,4 +24,4 @@ BandJS.loadPack('rhythm', 'european', {
     semiquaver: 0.0625,
     tripletSemiquaver: 0.041666667,
     demisemiquaver: 0.03125
-});
+};

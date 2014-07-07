@@ -1,7 +1,21 @@
 /**
- * Oscillator Instrument Pack,
+ * Band.js - Music Composer
+ * An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex
+ * time signatures.
+ *
+ * @author Cody Lundquist (http://github.com/meenie) - 2014
  */
-BandJS.loadPack('instrument', 'oscillators', function(name, audioContext) {
+module.exports = OscillatorInstrumentPack;
+
+/**
+ * Oscillator Instrument Pack
+ *
+ * @param name
+ * @param audioContext
+ * @returns {{createSound: createSound}}
+ * @constructor
+ */
+function OscillatorInstrumentPack(name, audioContext) {
     var types = {
         sine: 0,
         square: 1,
@@ -27,4 +41,4 @@ BandJS.loadPack('instrument', 'oscillators', function(name, audioContext) {
             return o;
         }
     };
-});
+}

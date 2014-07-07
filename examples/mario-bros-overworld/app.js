@@ -1,13 +1,14 @@
 var app = angular.module('app', ['ui.bootstrap']);
 app.controller('AppController', function($scope) {
-    var gameMusic = new BandJS();
 
-    gameMusic.setTimeSignature(2, 2);
-    gameMusic.setTempo(180);
+    var conductor = new BandJS();
 
-    var rightHand = gameMusic.createInstrument('square', 'oscillators'),
-        leftHand = gameMusic.createInstrument('triangle', 'oscillators'),
-        drum = gameMusic.createInstrument('white', 'noises');
+    conductor.setTimeSignature(2, 2);
+    conductor.setTempo(180);
+
+    var rightHand = conductor.createInstrument('square', 'oscillators'),
+        leftHand = conductor.createInstrument('triangle', 'oscillators'),
+        drum = conductor.createInstrument('white', 'noises');
 
     drum.setVolume(50);
 
@@ -474,25 +475,21 @@ app.controller('AppController', function($scope) {
 
     drum.rest('whole');
 
-    rightHand.repeatFromBeginning(2000);
-    leftHand.repeatFromBeginning(2000);
-    drum.repeatFromBeginning(2000);
+    rightHand.repeatFromBeginning(5);
+    leftHand.repeatFromBeginning(5);
+    drum.repeatFromBeginning(5);
 
-    rightHand.finish();
-    leftHand.finish();
-    drum.finish();
-
-    gameMusic.end();
+    var player = conductor.finish();
 
     $scope.playing = $scope.paused = $scope.muted = false;
     $scope.volume = 50;
     $scope.currentSeconds = 0;
     $scope.timeSlider = 0;
-    $scope.totalSeconds = gameMusic.getTotalSeconds();
+    $scope.totalSeconds = conductor.getTotalSeconds();
 
     var pauseTicker = false;
 
-    gameMusic.setTicker(function(seconds) {
+    conductor.setTickerCallback(function(seconds) {
         $scope.$apply(function() {
             if (! pauseTicker) {
                 $scope.currentSeconds = seconds;
@@ -500,7 +497,7 @@ app.controller('AppController', function($scope) {
         });
     });
 
-    gameMusic.onFinished(function() {
+    conductor.setOnFinished(function() {
         $scope.$apply(function() {
             $scope.playing = $scope.paused = false;
         });
@@ -509,22 +506,22 @@ app.controller('AppController', function($scope) {
     $scope.play = function() {
         $scope.playing = true;
         $scope.paused = false;
-        gameMusic.play();
+        player.play();
     };
 
     $scope.stop = function() {
         $scope.playing = $scope.paused = false;
-        gameMusic.stop();
+        player.stop();
     };
 
     $scope.pause = function() {
         $scope.paused = true;
-        gameMusic.pause();
+        player.pause();
     };
 
     $scope.updateTime = function() {
         pauseTicker = false;
-        gameMusic.setTime($scope.currentSeconds);
+        player.setTime($scope.currentSeconds);
     };
 
     $scope.movingTime = function() {
@@ -532,7 +529,7 @@ app.controller('AppController', function($scope) {
     };
 
     $scope.$watch('loop', function() {
-        gameMusic.loop($scope.loop);
+        player.loop($scope.loop);
     });
 
     $scope.$watch('mute', function(newVal, oldVal) {
@@ -541,15 +538,15 @@ app.controller('AppController', function($scope) {
         }
 
         if ($scope.mute) {
-            gameMusic.mute();
+            player.mute();
         } else {
-            gameMusic.unmute();
+            player.unmute();
         }
         $scope.muted = $scope.mute;
     });
 
     $scope.$watch('volume', function() {
-        gameMusic.setMasterVolume($scope.volume / 100);
+        conductor.setMasterVolume($scope.volume / 100);
     });
 });
 

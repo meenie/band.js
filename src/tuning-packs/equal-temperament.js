@@ -1,8 +1,16 @@
 /**
- * Equal Temperament tuning
+ * Band.js - Music Composer
+ * An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex
+ * time signatures.
+ *
+ * @author Cody Lundquist (http://github.com/meenie) - 2014
+ */
+
+/**
+ * Equal Temperament Tuning
  * Source: http://www.phy.mtu.edu/~suits/notefreqs.html
  */
-BandJS.loadPack('tuning', 'equalTemperament', {
+module.exports = {
     'C0': 16.35,
     'C#0': 17.32,
     'Db0': 17.32,
@@ -140,4 +148,4 @@ BandJS.loadPack('tuning', 'equalTemperament', {
     'Bb7': 3729.31,
     'B7': 3951.07,
     'C8': 4186.01
-});
+};

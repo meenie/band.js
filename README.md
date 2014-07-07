@@ -5,10 +5,10 @@ Band.js - Music Composer
 #### Get Started
 
 1. Include `band.min.js` in the head of your document.
-2. Create an new instance: `var music = new BandJS();`
-3. Give it a Time Signature: `music.setTimeSignature(4,4);`
-4. Set the tempo: `music.setTempo(120);`
-5. Create an instrument: `var piano = music.createInstrument();`
+2. Create an new instance: `var conductor = new BandJS();`
+3. Give it a Time Signature: `conductor.setTimeSignature(4,4);`
+4. Set the tempo: `conductor.setTempo(120);`
+5. Create an instrument: `var piano = conductor.createInstrument();`
 6. Start adding notes:
 
     ```javascript
@@ -18,9 +18,8 @@ Band.js - Music Composer
     piano.note('quarter', 'F4');
     ```
     
-7. Mark the `piano` instrument as finished: `piano.finish();`
-8. Tell the `music` everything is done: `music.end();`
-9. Start playing the music: `music.play()`
+7. Tell the `conductor` everything is done: `var player = conductor.finish();`. It will return you the player instance to use for playing, pausing, muting, stopping, and seeking.
+8. Start playing the music: `player.play()`
 
 #### Examples
 
@@ -31,7 +30,7 @@ Band.js - Music Composer
 
 #### API
 
-##### BandJS Class
+##### Conductor Class
 <table>
 <tr>
 <th width="20%">Method</th>
@@ -62,49 +61,14 @@ as it's default rhythm notation.</td>
 <td>Set the master volume of the music. From 0 to 100</td>
 </tr>
 <tr>
-<td><code>pause()</code></td>
+<td><code>finish()</code></td>
 <td>n/a</td>
-<td>Pause the music.</td>
-</tr>
-<tr>
-<td><code>stop(fadeOut)</code></td>
-<td><code>fadeOut: true</code></td>
-<td>Stop the music with a slight fade out.  If you don't want the fade, pass in false.</td>
-</tr>
-<tr>
-<td><code>destroy()</code></td>
-<td>n/a</td>
-<td>Stop the music and destroy all the instruments and notes.</td>
-</tr>
-<tr>
-<td><code>play()</code></td>
-<td>n/a</td>
-<td>Play the music.</td>
-</tr>
-<tr>
-<td><code>end()</code></td>
-<td>n/a</td>
-<td>Collects all of the notes of each finished instrument and creates the oscillators in preperation to play.</td>
-</tr>
-<tr>
-<td><code>mute(callback)</code></td>
-<td>n/a</td>
-<td>Mutes the music.  You can pass in a function as a callback when the music completely faded.</td>
-</tr>
-<tr>
-<td><code>unmute(callback)</code></td>
-<td>n/a</td>
-<td>Unmute the music. You can pass in a function as a callback when the music is completely faded up.</td>
+<td>Totals up the duration of the song and returns the Player Class.</td>
 </tr>
 <tr>
 <td><code>onFinished(callback)</code></td>
 <td>n/a</td>
 <td>Pass in a function that will be called when the music has completed</td>
-</tr>
-<tr>
-<td><code>loop(loop)</code></td>
-<td><code>loop: false</code></td>
-<td>Pass in true if you want the music to keep looping forever.</td>
 </tr>
 <tr>
 <td><code>createInstrument(name, pack)</code></td>
@@ -119,7 +83,7 @@ instrument pack if one is not specified.</td>
 <tr>
 <td valign="top"><code>load(json)</code></td>
 <td valign="top"><code>json: JSON</code></td>
-<td>Load a song into Band.js using JSON. Format is:<br>
+<td>Load a song into Band.js using JSON. Format is: (**This will erase your current song and overwrite it with this new one**)<br>
 <pre>{
     timeSignature: [4, 4],
     tempo: 100,
@@ -153,6 +117,15 @@ instrument pack if one is not specified.</td>
 }</pre>
 </td>
 </tr>
+</table>
+
+##### Conductor Class Static Methods
+<table>
+<tr>
+<th width="20%">Method</th>
+<th width="10%">Params</th>
+<th width="70%">Description</th>
+</tr>
 <tr>
 <td valign="top"><code>loadPack(type, name, data)</code></td>
 <td valign="top">
@@ -167,7 +140,7 @@ instrument pack if one is not specified.</td>
  frequency as the value (i.e. {'A4': 440.00, 'A#4': 466.16})<br>And lastly, the instrument pack type. This needs
  to be a function which takes 2 arguments, <code>name</code> and <code>audioContext</code>,
  that returns an object with at least one method called <code>createSound(destination, frequency)</code>.
- When an instrument is created using <code>BandJS::createInstrument(name, pack)</code> the library will use those two
+ When an instrument is created using <code>BandJS.createInstrument(name, pack)</code> the library will use those two
   parameters to search the instrument packs and get a specific instrument. Once found,
   it will call it's function and pass in the name of the sound and the Audio Context.  When the library
   wants the instrument to create a note, it will call the <code>createSound(destination,
@@ -179,12 +152,56 @@ instrument pack if one is not specified.</td>
 </tr>
 </table>
 
-##### Instrument Class - Created by using the `BandJS:createInstrument()` method.
+##### Player Class - Returned from the Conductor Class when calling `Conductor.finish()`
 <table>
 <tr>
 <th width="20%">Method</th>
-<th width="15%">Params</th>
-<th width="65%">Description</th>
+<th width="10%">Params</th>
+<th width="70%">Description</th>
+</tr>
+<tr>
+<td><code>play()</code></td>
+<td>n/a</td>
+<td>Play the music.</td>
+</tr>
+<tr>
+<td><code>pause()</code></td>
+<td>n/a</td>
+<td>Pause the music.</td>
+</tr>
+<tr>
+<td><code>stop(fadeOut)</code></td>
+<td><code>fadeOut: true</code></td>
+<td>Stop the music with a slight fade out.  If you don't want the fade, pass in false.</td>
+</tr>
+<tr>
+<td><code>mute(callback)</code></td>
+<td>n/a</td>
+<td>Mutes the music.  You can pass in a function as a callback when the music completely faded.</td>
+</tr>
+<tr>
+<td><code>unmute(callback)</code></td>
+<td>n/a</td>
+<td>Unmute the music. You can pass in a function as a callback when the music is completely faded up.</td>
+</tr>
+<tr>
+<td><code>loop(loop)</code></td>
+<td><code>loop: false</code></td>
+<td>Pass in true if you want the music to keep looping forever.</td>
+</tr>
+<tr>
+<td><code>setTime(seconds)</code></td>
+<td><code>seconds: 0</code></td>
+<td>You can set the specific time a song should start playing at. This is handy for seeking time.</td>
+</tr>
+</table>
+
+##### Instrument Class - Created by using the `Conductor.createInstrument()` method.
+<table>
+<tr>
+<th width="20%">Method</th>
+<th width="10%">Params</th>
+<th width="70%">Description</th>
 </tr>
 <tr>
 <td valign="top"><code>note(rhythm, pitch, tie)</code></td>
@@ -231,11 +248,6 @@ instrument pack if one is not specified.</td>
 <td><code>repeat(times)</code></td>
 <td><code>times: 1</code></td>
 <td>Used in conjunction with <code>repeatStart()</code>. Pass in how many times the section should be repeated.  If no <code>repeatStart()</code> is set, it goes from the beginning.</td>
-</tr>
-<tr>
-<td><code>finish()</code></td>
-<td>n/a</td>
-<td>This will mark the instrument as complete and add it's notes to the master list.  If this is missing, the instrument will not be played.</td>
 </tr>
 </table>
 
