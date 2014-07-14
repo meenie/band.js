@@ -206,7 +206,7 @@ function Conductor(tuning, rhythm) {
             volume = volume / 100;
         }
         conductor.masterVolumeLevel = volume;
-        conductor.masterVolume.gain.value = volume;
+        conductor.masterVolume.gain.setValueAtTime(volume, conductor.audioContext.currentTime);
     };
 
     /**
