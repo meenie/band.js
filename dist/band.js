@@ -719,28 +719,29 @@ function Player(conductor) {
         if ('up' !== direction && 'down' !== direction) {
             throw new Error('Direction must be either up or down.');
         }
+
+        var fadeDuration = 0.2;
+
         faded = direction === 'down';
-        var i = 100 * conductor.masterVolumeLevel,
-            fadeTimer = function() {
-                if (i > 0) {
-                    i = i - 4;
-                    i = i < 0 ? 0 : i;
-                    var gain = 'up' === direction ? conductor.masterVolumeLevel * 100 - i : i;
-                    conductor.masterVolume.gain.value = gain / 100;
-                    requestAnimationFrame(fadeTimer);
-                } else {
-                    if (typeof cb === 'function') {
-                        cb.call(player);
-                    }
 
-                    if (resetVolume) {
-                        faded = ! faded;
-                        conductor.masterVolume.gain.value = conductor.masterVolumeLevel;
-                    }
-                }
-            };
+        if (direction === 'up') {
+            conductor.masterVolume.gain.linearRampToValueAtTime(0, conductor.audioContext.currentTime);
+            conductor.masterVolume.gain.linearRampToValueAtTime(conductor.masterVolumeLevel, conductor.audioContext.currentTime + fadeDuration);
+        } else {
+            conductor.masterVolume.gain.linearRampToValueAtTime(conductor.masterVolumeLevel, conductor.audioContext.currentTime);
+            conductor.masterVolume.gain.linearRampToValueAtTime(0, conductor.audioContext.currentTime + fadeDuration);
+        }
 
-        fadeTimer();
+        setTimeout(function() {
+            if (typeof cb === 'function') {
+                cb.call(player);
+            }
+
+            if (resetVolume) {
+                faded = ! faded;
+                conductor.masterVolume.gain.linearRampToValueAtTime(conductor.masterVolumeLevel, conductor.audioContext.currentTime);
+            }
+        }, fadeDuration * 1000);
     }
 
     /**
@@ -835,7 +836,7 @@ function Player(conductor) {
                 }
             } else {
                 updateTotalPlayTime();
-                requestAnimationFrame(totalPlayTimeCalculator);
+                setTimeout(totalPlayTimeCalculator, 1000 / 60);
             }
         }
     }
