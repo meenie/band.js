@@ -28,6 +28,10 @@ Band.js - Music Composer
 * [Zelda Main Theme](http://plnkr.co/edit/jFnos1?p=preview) - Created by [legosjedi](http://www.reddit.com/user/legosjedi)
 * [Frog's Theme - Chrono Trigger](http://plnkr.co/edit/vVrFxg?p=preview) - Created by Me & Jarred Mack
 
+#### In The News
+
+* [Retro Game Music using Web Audio API and Band.js](http://modernweb.com/2013/09/09/retro-game-music-using-web-audio-and-band-js/)
+
 #### API
 
 ##### Conductor Class
