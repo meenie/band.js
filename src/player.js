@@ -16,32 +16,47 @@ module.exports = Player;
 function Player(conductor) {
     var player = this,
         bufferTimeout,
-        defaultBufferSize = 50,
-        allSounds = bufferSounds(),
+        allNotes = bufferNotes(),
         currentPlayTime,
         totalPlayTime = 0,
-        currentSeconds = 0,
         faded = false;
 
+    calculateTotalDuration();
+
     /**
-     * Helper function to stop all sound nodes and
+     * Helper function to stop all notes and
      * then re-buffers them
+     *
+     * @param {Boolean} [resetDuration]
      */
-    function reset() {
+    function reset(resetDuration) {
         // Reset the buffer position of all instruments
-        var index = -1;
-        while (++index < conductor.instruments.length) {
-            conductor.instruments[index].bufferPosition = 0;
+        var index = -1,
+            numOfInstruments = conductor.instruments.length;
+        while (++index < numOfInstruments) {
+            var instrument = conductor.instruments[index];
+
+            if (resetDuration) {
+                instrument.resetDuration();
+            }
+            instrument.bufferPosition = 0;
+        }
+
+        // If we are reseting the duration, we need to figure out the new total duration.
+        // Also set the totalPlayTime to the current percentage done of the new total duration.
+        if (resetDuration) {
+            calculateTotalDuration();
+            totalPlayTime = conductor.percentageComplete * conductor.totalDuration;
         }
 
         index = -1;
-        while (++index < allSounds.length) {
-            allSounds[index].gain.disconnect();
+        while (++index < allNotes.length) {
+            allNotes[index].gain.disconnect();
         }
 
         clearTimeout(bufferTimeout);
 
-        allSounds = bufferSounds();
+        allNotes = bufferNotes();
     }
 
     /**
@@ -84,41 +99,56 @@ function Player(conductor) {
     }
 
     /**
-     * Grabs a set of sounds based on the current time and what the Buffer Size is.
-     * It will also skip any sounds that have a start time less than the
-     * total play time.
+     * Calculates the total duration of a song based on the longest duration of all instruments.
      */
-    function bufferSounds(bufferSize) {
-        // Default buffer amount to 50 notes
-        if (! bufferSize) {
-            bufferSize = defaultBufferSize;
+    function calculateTotalDuration() {
+        var index = -1;
+        var totalDuration = 0;
+        while (++index < conductor.instruments.length) {
+            var instrument = conductor.instruments[index];
+            if (instrument.totalDuration > totalDuration) {
+                totalDuration = instrument.totalDuration;
+            }
         }
 
-        var sounds = [];
-        var index = -1;
+        conductor.totalDuration = totalDuration;
+    }
+
+    /**
+     * Grabs a set of notes based on the current time and what the Buffer Size is.
+     * It will also skip any notes that have a start time less than the
+     * total play time.
+     *
+     * @returns {Array}
+     */
+    function bufferNotes() {
+        var notes = [],
+            index = -1,
+            bufferSize = conductor.noteBufferLength;
+
         while (++index < conductor.instruments.length) {
             var instrument = conductor.instruments[index];
             // Create volume for this instrument
             var bufferCount = bufferSize;
             var index2 = -1;
             while (++index2 < bufferCount) {
-                var sound = instrument.sounds[instrument.bufferPosition + index2];
+                var note = instrument.notes[instrument.bufferPosition + index2];
 
-                if (typeof sound === 'undefined') {
+                if (typeof note === 'undefined') {
                     break;
                 }
 
-                var pitch = sound.pitch,
-                    startTime = sound.startTime,
-                    stopTime = sound.stopTime,
-                    volumeLevel = sound.volumeLevel;
+                var pitch = note.pitch,
+                    startTime = note.startTime,
+                    stopTime = note.stopTime,
+                    volumeLevel = note.volumeLevel;
 
                 if (stopTime < totalPlayTime) {
                     bufferCount ++;
                     continue;
                 }
 
-                // If pitch is false, then it's a rest and we don't need a sound
+                // If pitch is false, then it's a rest and we don't need a note
                 if (false === pitch) {
                     continue;
                 }
@@ -136,10 +166,10 @@ function Player(conductor) {
 
                 // No pitches defined
                 if (typeof pitch === 'undefined') {
-                    sounds.push({
+                    notes.push({
                         startTime: startTime < totalPlayTime ? stopTime - totalPlayTime : startTime,
                         stopTime: stopTime,
-                        node: instrument.instrument.createSound(gain),
+                        node: instrument.instrument.createNote(gain),
                         gain: gain,
                         volumeLevel: volumeLevel
                     });
@@ -147,10 +177,10 @@ function Player(conductor) {
                     var index3 = -1;
                     while (++index3 < pitch.length) {
                         var p = pitch[index3];
-                        sounds.push({
+                        notes.push({
                             startTime: startTime,
                             stopTime: stopTime,
-                            node: instrument.instrument.createSound(gain, conductor.pitches[p.trim()] || parseFloat(p)),
+                            node: instrument.instrument.createNote(gain, conductor.pitches[p.trim()] || parseFloat(p)),
                             gain: gain,
                             volumeLevel: volumeLevel
                         });
@@ -160,8 +190,8 @@ function Player(conductor) {
             instrument.bufferPosition += bufferCount;
         }
 
-        // Return array of sounds
-        return sounds;
+        // Return array of notes
+        return notes;
     }
 
     function totalPlayTimeCalculator() {
@@ -186,13 +216,14 @@ function Player(conductor) {
     function updateTotalPlayTime() {
         totalPlayTime += conductor.audioContext.currentTime - currentPlayTime;
         var seconds = Math.round(totalPlayTime);
-        if (seconds != currentSeconds) {
+        if (seconds != conductor.currentSeconds) {
             // Make callback asynchronous
             setTimeout(function() {
                 conductor.onTickerCallback(seconds);
             }, 1);
-            currentSeconds = seconds;
+            conductor.currentSeconds = seconds;
         }
+        conductor.percentageComplete = totalPlayTime / conductor.totalDuration;
         currentPlayTime = conductor.audioContext.currentTime;
     }
 
@@ -202,7 +233,7 @@ function Player(conductor) {
     player.muted = false;
     
     /**
-     * Grabs currently buffered sound nodes and calls their start/stop methods.
+     * Grabs currently buffered notes and calls their start/stop methods.
      *
      * It then sets up a timer to buffer up the next set of notes based on the
      * a set buffer size.  This will keep going until the song is stopped or paused.
@@ -216,47 +247,47 @@ function Player(conductor) {
         // Starts calculator which keeps track of total play time
         totalPlayTimeCalculator();
         var timeOffset = conductor.audioContext.currentTime - totalPlayTime,
-            playSounds = function(sounds) {
+            playNotes = function(notes) {
                 var index = -1;
-                while (++index < sounds.length) {
-                    var sound = sounds[index];
-                    var startTime = sound.startTime + timeOffset,
-                        stopTime = sound.stopTime + timeOffset;
+                while (++index < notes.length) {
+                    var note = notes[index];
+                    var startTime = note.startTime + timeOffset,
+                        stopTime = note.stopTime + timeOffset;
 
                     /**
                      * If no tie, then we need to introduce a volume ramp up to remove any clipping
                      * as Oscillators have an issue with this when playing a note at full volume.
                      * We also put in a slight ramp down as well.  This only takes up 1/1000 of a second.
                      */
-                    if (! sound.tie) {
+                    if (! note.tie) {
                         if (startTime > 0) {
                             startTime -= 0.001;
                         }
                         stopTime += 0.001;
-                        sound.gain.gain.setValueAtTime(0.0, startTime);
-                        sound.gain.gain.linearRampToValueAtTime(sound.volumeLevel, startTime + 0.001);
-                        sound.gain.gain.setValueAtTime(sound.volumeLevel, stopTime - 0.001);
-                        sound.gain.gain.linearRampToValueAtTime(0.0, stopTime);
+                        note.gain.gain.setValueAtTime(0.0, startTime);
+                        note.gain.gain.linearRampToValueAtTime(note.volumeLevel, startTime + 0.001);
+                        note.gain.gain.setValueAtTime(note.volumeLevel, stopTime - 0.001);
+                        note.gain.gain.linearRampToValueAtTime(0.0, stopTime);
                     }
 
-                    sound.node.start(startTime);
-                    sound.node.stop(stopTime);
+                    note.node.start(startTime);
+                    note.node.stop(stopTime);
                 }
             },
             bufferUp = function() {
-                bufferTimeout = setTimeout(function() {
+                bufferTimeout = setTimeout(function bufferInNewNotes() {
                     if (player.playing && ! player.paused) {
-                        var newSounds = bufferSounds();
-                        if (newSounds.length > 0) {
-                            playSounds(newSounds);
-                            allSounds = allSounds.concat(newSounds);
+                        var newNotes = bufferNotes();
+                        if (newNotes.length > 0) {
+                            playNotes(newNotes);
+                            allNotes = allNotes.concat(newNotes);
                             bufferUp();
                         }
                     }
-                }, 5000);
+                }, conductor.tempo * 5000);
             };
 
-        playSounds(allSounds);
+        playNotes(allNotes);
         bufferUp();
 
         if (faded && ! player.muted) {
@@ -270,7 +301,8 @@ function Player(conductor) {
      */
     player.stop = function(fadeOut) {
         player.playing = false;
-        currentSeconds = 0;
+        conductor.currentSeconds = 0;
+        conductor.percentageComplete = 0;
 
         if (typeof fadeOut === 'undefined') {
             fadeOut = true;
@@ -281,7 +313,7 @@ function Player(conductor) {
                 reset();
                 // Make callback asynchronous
                 setTimeout(function() {
-                    conductor.onTickerCallback(currentSeconds);
+                    conductor.onTickerCallback(conductor.currentSeconds);
                 }, 1);
             }, true);
         } else {
@@ -289,13 +321,13 @@ function Player(conductor) {
             reset();
             // Make callback asynchronous
             setTimeout(function() {
-                conductor.onTickerCallback(currentSeconds);
+                conductor.onTickerCallback(conductor.currentSeconds);
             }, 1);
         }
     };
 
     /**
-     * Pauses the music, resets the sound nodes,
+     * Pauses the music, resets the notes,
      * and gets the total time played so far
      */
     player.pause = function() {
@@ -329,6 +361,17 @@ function Player(conductor) {
     player.setTime = function(newTime) {
         totalPlayTime = parseInt(newTime);
         reset();
+        if (player.playing && ! player.paused) {
+            player.play();
+        }
+    };
+
+    /**
+     * Reset the tempo for a song. This will trigger a
+     * duration reset for each instrument as well.
+     */
+    player.resetTempo = function() {
+        reset(true);
         if (player.playing && ! player.paused) {
             player.play();
         }

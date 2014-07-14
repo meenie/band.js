@@ -12,7 +12,7 @@ module.exports = OscillatorInstrumentPack;
  *
  * @param name
  * @param audioContext
- * @returns {{createSound: createSound}}
+ * @returns {{createNote: createNote}}
  * @constructor
  */
 function OscillatorInstrumentPack(name, audioContext) {
@@ -28,7 +28,7 @@ function OscillatorInstrumentPack(name, audioContext) {
     }
 
     return {
-        createSound: function(destination, frequency) {
+        createNote: function(destination, frequency) {
             var o = audioContext.createOscillator();
 
             // Connect note to volume

@@ -1,10 +1,12 @@
 var app = angular.module('app', ['ui.bootstrap']);
 app.controller('AppController', function($scope) {
 
+    $scope.tempo = 120;
+
     var songs = {
         c_major: {
             timeSignature: [4, 4],
-            tempo: 120,
+            tempo: $scope.tempo,
             instruments: {
                 rightHand: {
                     name: 'square',
@@ -27,7 +29,7 @@ app.controller('AppController', function($scope) {
         },
         g_major: {
             timeSignature: [4, 4],
-            tempo: 120,
+            tempo: $scope.tempo,
             instruments: {
                 rightHand: {
                     name: 'square',
@@ -113,6 +115,7 @@ app.controller('AppController', function($scope) {
         }
         player = conductor.load(songs[songName]);
         $scope.totalSeconds = conductor.getTotalSeconds();
+        $scope.tempo = songs[songName].tempo;
     };
 
     var pauseTicker = false;
@@ -125,10 +128,14 @@ app.controller('AppController', function($scope) {
         });
     });
 
-    conductor.setOnFinished(function() {
+    conductor.setOnFinishedCallback(function() {
         $scope.$apply(function() {
             $scope.playing = $scope.paused = false;
         });
+    });
+
+    conductor.setOnDurationChangeCallback(function() {
+        $scope.totalSeconds = conductor.getTotalSeconds();
     });
 
     $scope.play = function() {
@@ -150,6 +157,11 @@ app.controller('AppController', function($scope) {
     $scope.updateTime = function() {
         pauseTicker = false;
         player.setTime($scope.currentSeconds);
+    };
+
+    $scope.updateTempo = function() {
+        pauseTicker = false;
+        conductor.setTempo($scope.tempo);
     };
 
     $scope.movingTime = function() {

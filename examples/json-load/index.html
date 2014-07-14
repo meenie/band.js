@@ -52,7 +52,14 @@
                 </div>
                 <div class="row volume">
                     <div class="col-xs-12 text-center">
-                        <input ng-disabled="muted" type="range" ng-model="volume">
+                        <label for="update-volume">Volume: {{volume}}</label><br>
+                        <input id="update-volume" ng-disabled="muted" type="range" ng-model="volume">
+                    </div>
+                </div>
+                <div class="row tempo">
+                    <div class="col-xs-12 text-center">
+                        <label for="update-tempo">Tempo: {{tempo}}</label><br>
+                        <input id="update-tempo" type="range" min="30" max="300" ng-model="tempo" ng-mouseup="updateTempo()">
                     </div>
                 </div>
             </div>

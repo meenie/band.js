@@ -14,7 +14,7 @@ module.exports = NoisesInstrumentPack;
  *
  * @param name
  * @param audioContext
- * @returns {{createSound: createSound}}
+ * @returns {{createNote: createNote}}
  * @constructor
  */
 function NoisesInstrumentPack(name, audioContext) {
@@ -31,7 +31,7 @@ function NoisesInstrumentPack(name, audioContext) {
     }
 
     return {
-        createSound: function(destination) {
+        createNote: function(destination) {
             switch (name) {
                 case 'white':
                     return createWhiteNoise(destination);

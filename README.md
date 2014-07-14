@@ -37,9 +37,9 @@ Band.js - Music Composer
 ##### Conductor Class
 <table>
 <tr>
-<th width="20%">Method</th>
-<th width="10%">Params</th>
-<th width="70%">Description</th>
+<th width="25%">Method</th>
+<th width="25%">Params</th>
+<th width="50%">Description</th>
 </tr>
 <tr>
 <td><code>constructor(tuning, rhythm)</code></td>
@@ -57,7 +57,7 @@ as it's default rhythm notation.</td>
 <tr>
 <td><code>setTempo(tempo)</code></td>
 <td><code>tempo: 120</code></td>
-<td>Set the tempo (BPM) of the music</td>
+<td>Set the tempo (BPM) of the music.  If a player has been instantiated, then the onDurationChangeCallback will be called.</td>
 </tr>
 <tr>
 <td><code>setMasterVolume(volume)</code></td>
@@ -65,14 +65,38 @@ as it's default rhythm notation.</td>
 <td>Set the master volume of the music. From 0 to 100</td>
 </tr>
 <tr>
+<td><code>getTotalSeconds()</code></td>
+<td><code>n/a</code></td>
+<td>Returns the total number of seconds a song is.</td>
+</tr>
+<tr>
+<td><code>setNoteBufferLength(bufferLength)</code></td>
+<td><code>bufferLength: 20</code></td>
+<td>Set the number of notes that are buffered every (tempo / 60 * 5) seconds.
+**WARNING** The higher this is, the more memory is used and can crash your browser.
+If notes are being dropped, you can increase this, but be weary of used memory.</td>
+</tr>
+<tr>
 <td><code>finish()</code></td>
-<td>n/a</td>
+<td><code>n/a</code></td>
 <td>Totals up the duration of the song and returns the Player Class.</td>
 </tr>
 <tr>
-<td><code>onFinished(callback)</code></td>
-<td>n/a</td>
+<td><code>setOnFinishedCallback(callback)</code></td>
+<td><code>callback: Func</code></td>
 <td>Pass in a function that will be called when the music has completed</td>
+</tr>
+<tr>
+<td><code>setTickerCallback(callback)</code></td>
+<td><code>callback: Func</code></td>
+<td>Pass in a function that will be called every second the music is playing. 
+It will pass the current number of seconds that have passed.</td>
+</tr>
+<tr>
+<td><code>setOnDurationChangeCallback(callback)</code></td>
+<td><code>callback: Func</code></td>
+<td>Pass in a function that will be called when the duration of a song has changed.  Most likely
+it's because you have changed the tempo of a song.</td>
 </tr>
 <tr>
 <td><code>createInstrument(name, pack)</code></td>
@@ -126,9 +150,9 @@ instrument pack if one is not specified.</td>
 ##### Conductor Class Static Methods
 <table>
 <tr>
-<th width="20%">Method</th>
-<th width="10%">Params</th>
-<th width="70%">Description</th>
+<th width="25%">Method</th>
+<th width="25%">Params</th>
+<th width="50%">Description</th>
 </tr>
 <tr>
 <td valign="top"><code>loadPack(type, name, data)</code></td>
@@ -143,11 +167,11 @@ instrument pack if one is not specified.</td>
  <code>{whole: 1, half: 0.5}</code>).<br>For tuning, it needs to be an object of pitch name as the key and
  frequency as the value (i.e. {'A4': 440.00, 'A#4': 466.16})<br>And lastly, the instrument pack type. This needs
  to be a function which takes 2 arguments, <code>name</code> and <code>audioContext</code>,
- that returns an object with at least one method called <code>createSound(destination, frequency)</code>.
+ that returns an object with at least one method called <code>createNote(destination, frequency)</code>.
  When an instrument is created using <code>BandJS.createInstrument(name, pack)</code> the library will use those two
   parameters to search the instrument packs and get a specific instrument. Once found,
   it will call it's function and pass in the name of the sound and the Audio Context.  When the library
-  wants the instrument to create a note, it will call the <code>createSound(destination,
+  wants the instrument to create a note, it will call the <code>createNote(destination,
   frequency)</code> method and pass in the destination where the AudioNode you create should connect to. It will
   also pass in the frequency if you need it to create the note.  Once the node is created,
   it needs to be returned and the library will run it's methods <code>start()</code> and <code>stop()</code> to
@@ -159,18 +183,18 @@ instrument pack if one is not specified.</td>
 ##### Player Class - Returned from the Conductor Class when calling `Conductor.finish()`
 <table>
 <tr>
-<th width="20%">Method</th>
-<th width="10%">Params</th>
-<th width="70%">Description</th>
+<th width="25%">Method</th>
+<th width="25%">Params</th>
+<th width="50%">Description</th>
 </tr>
 <tr>
 <td><code>play()</code></td>
-<td>n/a</td>
+<td><code>n/a</code></td>
 <td>Play the music.</td>
 </tr>
 <tr>
 <td><code>pause()</code></td>
-<td>n/a</td>
+<td><code>n/a</code></td>
 <td>Pause the music.</td>
 </tr>
 <tr>
@@ -180,12 +204,12 @@ instrument pack if one is not specified.</td>
 </tr>
 <tr>
 <td><code>mute(callback)</code></td>
-<td>n/a</td>
+<td><code>n/a</code></td>
 <td>Mutes the music.  You can pass in a function as a callback when the music completely faded.</td>
 </tr>
 <tr>
 <td><code>unmute(callback)</code></td>
-<td>n/a</td>
+<td><code>n/a</code></td>
 <td>Unmute the music. You can pass in a function as a callback when the music is completely faded up.</td>
 </tr>
 <tr>
@@ -203,9 +227,9 @@ instrument pack if one is not specified.</td>
 ##### Instrument Class - Created by using the `Conductor.createInstrument()` method.
 <table>
 <tr>
-<th width="20%">Method</th>
-<th width="10%">Params</th>
-<th width="70%">Description</th>
+<th width="25%">Method</th>
+<th width="25%">Params</th>
+<th width="50%">Description</th>
 </tr>
 <tr>
 <td valign="top"><code>note(rhythm, pitch, tie)</code></td>
@@ -245,7 +269,7 @@ instrument pack if one is not specified.</td>
 </tr>
 <tr>
 <td><code>repeatStart()</code></td>
-<td>n/a</td>
+<td><code>n/a</code></td>
 <td>Puts in a marker where a section of music should be repeated from.</td>
 </tr>
 <tr>

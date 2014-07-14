@@ -1,10 +1,12 @@
 var app = angular.module('app', ['ui.bootstrap']);
 app.controller('AppController', function($scope) {
 
+    $scope.tempo = 180;
+
     var conductor = new BandJS();
 
     conductor.setTimeSignature(2, 2);
-    conductor.setTempo(180);
+    conductor.setTempo($scope.tempo);
 
     var rightHand = conductor.createInstrument('square', 'oscillators'),
         leftHand = conductor.createInstrument('triangle', 'oscillators'),
@@ -497,10 +499,14 @@ app.controller('AppController', function($scope) {
         });
     });
 
-    conductor.setOnFinished(function() {
+    conductor.setOnFinishedCallback(function() {
         $scope.$apply(function() {
             $scope.playing = $scope.paused = false;
         });
+    });
+
+    conductor.setOnDurationChangeCallback(function() {
+        $scope.totalSeconds = conductor.getTotalSeconds();
     });
 
     $scope.play = function() {
@@ -522,6 +528,11 @@ app.controller('AppController', function($scope) {
     $scope.updateTime = function() {
         pauseTicker = false;
         player.setTime($scope.currentSeconds);
+    };
+
+    $scope.updateTempo = function() {
+        pauseTicker = false;
+        conductor.setTempo($scope.tempo);
     };
 
     $scope.movingTime = function() {

@@ -61,12 +61,13 @@ function Instrument(name, pack, conductor) {
     
     var instrument = this,
         lastRepeatCount = 0,
-        volumeLevel = 1;
+        volumeLevel = 1,
+        articulationGapPercentage = 0.05;
 
     instrument.totalDuration = 0;
     instrument.bufferPosition = 0;
     instrument.instrument = conductor.packs.instrument[pack](name, conductor.audioContext);
-    instrument.sounds = [];
+    instrument.notes = [];
     
     /**
      * Set volume level for an instrument
@@ -90,11 +91,11 @@ function Instrument(name, pack, conductor) {
      */
     instrument.note = function(rhythm, pitch, tie) {
         var duration = getDuration(rhythm),
-            articulationGap = tie ? 0 : duration * 0.05;
+            articulationGap = tie ? 0 : duration * articulationGapPercentage;
 
         if (pitch) {
             pitch = pitch.split(',');
-            var index = - 1;
+            var index = -1;
             while (++ index < pitch.length) {
                 var p = pitch[index];
                 p = p.trim();
@@ -107,15 +108,16 @@ function Instrument(name, pack, conductor) {
             }
         }
 
-        instrument.sounds.push({
+        instrument.notes.push({
+            rhythm: rhythm,
             pitch: pitch,
             duration: duration,
             articulationGap: articulationGap,
             tie: tie,
             startTime: instrument.totalDuration,
+            stopTime: instrument.totalDuration + duration - articulationGap,
             // Volume needs to be a quarter of the master so it doesn't clip
-            volumeLevel: volumeLevel / 4,
-            stopTime: instrument.totalDuration + duration - articulationGap
+            volumeLevel: volumeLevel / 4
         });
 
         instrument.totalDuration += duration;
@@ -131,7 +133,8 @@ function Instrument(name, pack, conductor) {
     instrument.rest = function(rhythm) {
         var duration = getDuration(rhythm);
 
-        instrument.sounds.push({
+        instrument.notes.push({
+            rhythm: rhythm,
             pitch: false,
             duration: duration,
             articulationGap: 0,
@@ -148,7 +151,7 @@ function Instrument(name, pack, conductor) {
      * Place where a repeat section should start
      */
     instrument.repeatStart = function() {
-        lastRepeatCount = instrument.sounds.length;
+        lastRepeatCount = instrument.notes.length;
 
         return instrument;
     };
@@ -169,20 +172,46 @@ function Instrument(name, pack, conductor) {
      */
     instrument.repeat = function(numOfRepeats) {
         numOfRepeats = typeof numOfRepeats === 'undefined' ? 1 : numOfRepeats;
-        var soundsBufferCopy = instrument.sounds.slice(lastRepeatCount);
+        var notesBufferCopy = instrument.notes.slice(lastRepeatCount);
         for (var r = 0; r < numOfRepeats; r ++) {
-            var index = - 1;
-            while (++index < soundsBufferCopy.length) {
-                var soundCopy = clone(soundsBufferCopy[index]);
+            var index = -1;
+            while (++index < notesBufferCopy.length) {
+                var noteCopy = clone(notesBufferCopy[index]);
 
-                soundCopy.startTime = instrument.totalDuration;
-                soundCopy.stopTime = instrument.totalDuration + soundCopy.duration - soundCopy.articulationGap;
+                noteCopy.startTime = instrument.totalDuration;
+                noteCopy.stopTime = instrument.totalDuration + noteCopy.duration - noteCopy.articulationGap;
 
-                instrument.sounds.push(soundCopy);
-                instrument.totalDuration += soundCopy.duration;
+                instrument.notes.push(noteCopy);
+                instrument.totalDuration += noteCopy.duration;
             }
         }
 
         return instrument;
+    };
+
+    /**
+     * Reset the duration, start, and stop time of each note.
+     */
+    instrument.resetDuration = function() {
+        var index = -1,
+            numOfNotes = instrument.notes.length;
+
+        instrument.totalDuration = 0;
+
+        while (++index < numOfNotes) {
+            var note = instrument.notes[index],
+                duration = getDuration(note.rhythm),
+                articulationGap = note.tie ? 0 : duration * articulationGapPercentage;
+
+            note.duration = getDuration(note.rhythm);
+            note.startTime = instrument.totalDuration;
+            note.stopTime = instrument.totalDuration + duration - articulationGap;
+
+            if (note.pitch !== false) {
+                note.articulationGap = articulationGap;
+            }
+
+            instrument.totalDuration += duration;
+        }
     };
 }

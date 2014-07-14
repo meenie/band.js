@@ -38,6 +38,7 @@ function Conductor(tuning, rhythm) {
     }
 
     var conductor = this,
+        player,
         noop = function() {},
         AudioContext = require('audiocontext'),
         signatureToNoteLengthRatio = {
@@ -58,8 +59,12 @@ function Conductor(tuning, rhythm) {
     conductor.tempo = null;
     conductor.instruments = [];
     conductor.totalDuration = 0;
+    conductor.currentSeconds = 0;
+    conductor.percentageComplete = 0;
+    conductor.noteBufferLength = 20;
     conductor.onTickerCallback = noop;
     conductor.onFinishedCallback = noop;
+    conductor.onDurationChangeCallback = noop;
 
     /**
      * Use JSON to load in a song to be played
@@ -111,7 +116,7 @@ function Conductor(tuning, rhythm) {
             if (! json['notes'].hasOwnProperty(inst)) {
                 continue;
             }
-            var index = - 1;
+            var index = -1;
             while (++ index < json['notes'][inst].length) {
                 var note = json['notes'][inst][index];
                 // Use shorthand if it's a string
@@ -160,19 +165,10 @@ function Conductor(tuning, rhythm) {
      * It returns the Player object.
      */
     conductor.finish = function() {
-        var index = -1;
-        var totalDuration = 0;
-        while (++index < conductor.instruments.length) {
-            var instrument = conductor.instruments[index];
-            if (instrument.totalDuration > totalDuration) {
-                totalDuration = instrument.totalDuration;
-            }
-        }
-
-        conductor.totalDuration = totalDuration;
-
         var Player = require('./player.js');
-        return new Player(conductor);
+        player = new Player(conductor);
+
+        return player;
     };
 
     /**
@@ -241,6 +237,12 @@ function Conductor(tuning, rhythm) {
      */
     conductor.setTempo = function(t) {
         conductor.tempo = 60 / t;
+
+        // If we have a player instance, we need to recalculate duration after resetting the tempo.
+        if (player) {
+            player.resetTempo();
+            conductor.onDurationChangeCallback();
+        }
     };
 
     /**
@@ -248,12 +250,39 @@ function Conductor(tuning, rhythm) {
      *
      * @param cb
      */
-    conductor.setOnFinished = function(cb) {
+    conductor.setOnFinishedCallback = function(cb) {
         if (typeof cb !== 'function') {
             throw new Error('onFinished callback must be a function.');
         }
 
         conductor.onFinishedCallback = cb;
+    };
+
+    /**
+     * Set a callback to fire when duration of a song changes
+     *
+     * @param cb
+     */
+    conductor.setOnDurationChangeCallback = function(cb) {
+        if (typeof cb !== 'function') {
+            throw new Error('onDurationChanged callback must be a function.');
+        }
+
+        conductor.onDurationChangeCallback = cb;
+    };
+
+    /**
+     * Set the number of notes that are buffered every (tempo / 60 * 5) seconds.
+     * It's set to 20 notes by default.
+     *
+     * **WARNING** The higher this is, the more memory is used and can crash your browser.
+     *             If notes are being dropped, you can increase this, but be weary of
+     *             used memory.
+     *
+     * @param {Integer} len
+     */
+    conductor.setNoteBufferLength = function(len) {
+        conductor.noteBufferLength = len;
     };
 
     conductor.setMasterVolume(100);
@@ -262,7 +291,7 @@ function Conductor(tuning, rhythm) {
 }
 
 Conductor.loadPack = function(type, name, data) {
-    if (['tuning', 'rhythm', 'instrument'].indexOf(type) === - 1) {
+    if (['tuning', 'rhythm', 'instrument'].indexOf(type) === -1) {
         throw new Error(type = ' is not a valid Pack Type.');
     }
 
