@@ -81,44 +81,44 @@ function Conductor(tuning, rhythm) {
             throw new Error('JSON is required for this method to work.');
         }
         // Need to have at least instruments and notes
-        if (typeof json['instruments'] === 'undefined') {
+        if (typeof json.instruments === 'undefined') {
             throw new Error('You must define at least one instrument');
         }
-        if (typeof json['notes'] === 'undefined') {
+        if (typeof json.notes === 'undefined') {
             throw new Error('You must define notes for each instrument');
         }
 
         // Shall we set a time signature?
-        if (typeof json['timeSignature'] !== 'undefined') {
-            conductor.setTimeSignature(json['timeSignature'][0], json['timeSignature'][1]);
+        if (typeof json.timeSignature !== 'undefined') {
+            conductor.setTimeSignature(json.timeSignature[0], json.timeSignature[1]);
         }
 
         // Maybe some tempo?
-        if (typeof json['tempo'] !== 'undefined') {
-            conductor.setTempo(json['tempo']);
+        if (typeof json.tempo !== 'undefined') {
+            conductor.setTempo(json.tempo);
         }
 
         // Lets create some instruments
         var instrumentList = {};
-        for (var instrument in json['instruments']) {
-            if (! json['instruments'].hasOwnProperty(instrument)) {
+        for (var instrument in json.instruments) {
+            if (! json.instruments.hasOwnProperty(instrument)) {
                 continue;
             }
 
             instrumentList[instrument] = conductor.createInstrument(
-                json['instruments'][instrument].name,
-                json['instruments'][instrument].pack
+                json.instruments[instrument].name,
+                json.instruments[instrument].pack
             );
         }
 
         // Now lets add in each of the notes
-        for (var inst in json['notes']) {
-            if (! json['notes'].hasOwnProperty(inst)) {
+        for (var inst in json.notes) {
+            if (! json.notes.hasOwnProperty(inst)) {
                 continue;
             }
             var index = -1;
-            while (++ index < json['notes'][inst].length) {
-                var note = json['notes'][inst][index];
+            while (++ index < json.notes[inst].length) {
+                var note = json.notes[inst][index];
                 // Use shorthand if it's a string
                 if (typeof note === 'string') {
                     var noteParts = note.split('|');
@@ -292,7 +292,7 @@ function Conductor(tuning, rhythm) {
 
 Conductor.loadPack = function(type, name, data) {
     if (['tuning', 'rhythm', 'instrument'].indexOf(type) === -1) {
-        throw new Error(type = ' is not a valid Pack Type.');
+        throw new Error(type + ' is not a valid Pack Type.');
     }
 
     if (typeof packs[type][name] !== 'undefined') {

@@ -1,0 +1,28 @@
+{
+    "browser": true,
+    "curly": true,
+    "eqnull": true,
+    "immed": true,
+    "jquery": false,
+    "newcap": true,
+    "noarg": true,
+    "smarttabs": true,
+    "sub": true,
+    "undef": true,
+    "unused": true,
+    "globals": {
+        "require": true,
+        "it": true,
+        "iit": true,
+        "xit": true,
+        "describe": true,
+        "ddescribe": true,
+        "xdescribe": true,
+        "expect": true,
+        "beforeEach": true,
+        "module": true,
+        "spyOn": true,
+        "afterEach": true,
+        "console": true
+    }
+}

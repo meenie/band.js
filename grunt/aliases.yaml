@@ -1,0 +1,22 @@
+---
+default:
+  - "deploy"
+
+deploy:
+  - "test"
+  - "clean:dist"
+  - "browserify:deploy"
+  - "uglify:deploy"
+
+release:
+  - "checkbranch:master"
+  - "prompt:deploy"
+
+test:
+  - "jshint"
+  - "karma:once"
+
+run:
+  - "test"
+  - "karma:watch"
+  - "watch"
