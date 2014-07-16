@@ -1,6 +1,6 @@
 {
   "name": "BandJS",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Band.js - Music Composer - An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex time signatures.",
   "main": "src/main.js",
   "repository": {
