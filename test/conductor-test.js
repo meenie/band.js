@@ -1,4 +1,3 @@
-var Conductor = require('../src/conductor');
 describe('Conductor Class', function() {
     var Conductor = require('../src/conductor');
 

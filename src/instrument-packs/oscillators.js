@@ -16,14 +16,9 @@ module.exports = OscillatorInstrumentPack;
  * @constructor
  */
 function OscillatorInstrumentPack(name, audioContext) {
-    var types = {
-        sine: 0,
-        square: 1,
-        sawtooth: 2,
-        triangle: 3
-    };
+    var types = ['sine', 'square', 'sawtooth', 'triangle'];
 
-    if (typeof types[name] === 'undefined') {
+    if (types.indexOf(name) === -1) {
         throw new Error(name + ' is not a valid Oscillator type');
     }
 
@@ -34,7 +29,7 @@ function OscillatorInstrumentPack(name, audioContext) {
             // Connect note to volume
             o.connect(destination);
             // Set pitch type
-            o.type = types[name];
+            o.type = name;
             // Set frequency
             o.frequency.value = frequency;
 
