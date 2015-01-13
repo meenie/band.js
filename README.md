@@ -2,6 +2,8 @@ Band.js - Music Composer
 ====
 #### An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex time signatures.
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/meenie/band.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 #### Get Started
 
 1. Include `band.min.js` in the head of your document.
