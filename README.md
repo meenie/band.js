@@ -113,7 +113,7 @@ instrument pack if one is not specified.</td>
 <tr>
 <td valign="top"><code>load(json)</code></td>
 <td valign="top"><code>json: JSON</code></td>
-<td>Load a song into Band.js using JSON. Format is: (**This will erase your current song and overwrite it with this new one**)<br>
+<td>Load a song into Band.js using JSON. Returns the Player Class. Format is: (**This will erase your current song and overwrite it with this new one**)<br>
 <pre>{
     timeSignature: [4, 4],
     tempo: 100,
