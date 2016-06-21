@@ -175,6 +175,7 @@ function Conductor(tuning, rhythm) {
      * Remove all instruments and recreate AudioContext
      */
     conductor.destroy = function() {
+        conductor.audioContext.close();
         conductor.audioContext = new AudioContext();
         conductor.instruments.length = 0;
         conductor.masterVolume = conductor.audioContext.createGain();
