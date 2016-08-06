@@ -713,9 +713,11 @@ module.exports.loadPack('instrument', 'noises', _dereq_('./instrument-packs/nois
 module.exports.loadPack('instrument', 'oscillators', _dereq_('./instrument-packs/oscillators.js'));
 module.exports.loadPack('rhythm', 'northAmerican', _dereq_('./rhythm-packs/north-american.js'));
 module.exports.loadPack('rhythm', 'european', _dereq_('./rhythm-packs/european.js'));
+module.exports.loadPack('rhythm', 'latino', _dereq_('./rhythm-packs/latino-american.js'));
 module.exports.loadPack('tuning', 'equalTemperament', _dereq_('./tuning-packs/equal-temperament.js'));
+module.exports.loadPack('tuning', 'equalProcedural', _dereq_('./tuning-packs/equal-procedural.js'));
 
-},{"./conductor.js":2,"./instrument-packs/noises.js":3,"./instrument-packs/oscillators.js":4,"./rhythm-packs/european.js":8,"./rhythm-packs/north-american.js":9,"./tuning-packs/equal-temperament.js":10}],7:[function(_dereq_,module,exports){
+},{"./conductor.js":2,"./instrument-packs/noises.js":3,"./instrument-packs/oscillators.js":4,"./rhythm-packs/european.js":8,"./rhythm-packs/north-american.js":9,"./rhythm-packs/latino-american.js":10,"./tuning-packs/equal-temperament.js":11,"./tuning-packs/equal-procedural.js":12}],7:[function(_dereq_,module,exports){
 /**
  * Band.js - Music Composer
  * An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex
@@ -1184,6 +1186,37 @@ module.exports = {
  */
 
 /**
+ * Latino American Rhythm Pack - Image reference: http://i.imgur.com/IQURaxM.png
+ */
+module.exports = {
+    1: 0.0625,
+    2: 0.125,
+    3: 0.1875,
+    4: 0.25,
+    5: 0.3125,
+    6: 0.375,
+    7: 0.4375,
+    8: 0.5,
+    9: 0.5625,
+    10: 0.625,
+    11: 0.6875,
+    12: 0.75,
+    13: 0.8125,
+    14: 0.875,
+    15: 0.9375,
+    16: 1
+};
+
+},{}],11:[function(_dereq_,module,exports){
+/**
+ * Band.js - Music Composer
+ * An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex
+ * time signatures.
+ *
+ * @author Cody Lundquist (http://github.com/meenie) - 2014
+ */
+
+/**
  * Equal Temperament Tuning
  * Source: http://www.phy.mtu.edu/~suits/notefreqs.html
  */
@@ -1327,6 +1360,157 @@ module.exports = {
     'C8': 4186.01
 };
 
-},{}]},{},[6])
-(6)
-});
+},{}],12:[function(_dereq_,module,exports){
+/**
+ * Band.js - Music Composer
+ * An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex
+ * time signatures.
+ *
+ * @author Cody Lundquist (http://github.com/meenie) - 2014
+ */
+
+/**
+ * Equal Temperament Tuning - Procedural Notation
+ * Source: http://www.phy.mtu.edu/~suits/notefreqs.html
+ */
+module.exports = {
+    '01': 16.35,
+    '01s': 17.32,
+    '02b': 17.32,
+    '02': 18.35,
+    '02s': 19.45,
+    '03b': 19.45,
+    '03': 20.60,
+    '04': 21.83,
+    '04s': 23.12,
+    '05b': 23.12,
+    '05': 24.50,
+    '05s': 25.96,
+    '06b': 25.96,
+    '06': 27.50,
+    '06s': 29.14,
+    '07b': 29.14,
+    '07': 30.87,
+    '11': 32.70,
+    '11s': 34.65,
+    '12b': 34.65,
+    '12': 36.71,
+    '12s': 38.89,
+    '13b': 38.89,
+    '13': 41.20,
+    '14': 43.65,
+    '14s': 46.25,
+    '15b': 46.25,
+    '15': 49.00,
+    '15s': 51.91,
+    '16b': 51.91,
+    '16': 55.00,
+    '16s': 58.27,
+    '17b': 58.27,
+    '17': 61.74,
+    '21': 65.41,
+    '21s': 69.30,
+    '22b': 69.30,
+    '22': 73.42,
+    '22s': 77.78,
+    '23b': 77.78,
+    '23': 82.41,
+    '24': 87.31,
+    '24s': 92.50,
+    '25b': 92.50,
+    '25': 98.00,
+    '25s': 103.83,
+    '26b': 103.83,
+    '26': 110.00,
+    '26s': 116.54,
+    '27b': 116.54,
+    '27': 123.47,
+    '31': 130.81,
+    '31s': 138.59,
+    '32b': 138.59,
+    '32': 146.83,
+    '32s': 155.56,
+    '33b': 155.56,
+    '33': 164.81,
+    '34': 174.61,
+    '34s': 185.00,
+    '35b': 185.00,
+    '35': 196.00,
+    '35s': 207.65,
+    '36b': 207.65,
+    '36': 220.00,
+    '36s': 233.08,
+    '37b': 233.08,
+    '37': 246.94,
+    '41': 261.63,
+    '41s': 277.18,
+    '42b': 277.18,
+    '42': 293.66,
+    '42s': 311.13,
+    '43b': 311.13,
+    '43': 329.63,
+    '44': 349.23,
+    '44s': 369.99,
+    '45b': 369.99,
+    '45': 392.00,
+    '45s': 415.30,
+    '46b': 415.30,
+    '46': 440.00,
+    '46s': 466.16,
+    '47b': 466.16,
+    '47': 493.88,
+    '51': 523.25,
+    '51s': 554.37,
+    '52b': 554.37,
+    '52': 587.33,
+    '52s': 622.25,
+    '53b': 622.25,
+    '53': 659.26,
+    '54': 698.46,
+    '54s': 739.99,
+    '55b': 739.99,
+    '55': 783.99,
+    '55s': 830.61,
+    '56b': 830.61,
+    '56': 880.00,
+    '56s': 932.33,
+    '57b': 932.33,
+    '57': 987.77,
+    '61': 1046.50,
+    '61s': 1108.73,
+    '62b': 1108.73,
+    '62': 1174.66,
+    '62s': 1244.51,
+    '63b': 1244.51,
+    '63': 1318.51,
+    '64': 1396.91,
+    '64s': 1479.98,
+    '65b': 1479.98,
+    '65': 1567.98,
+    '65s': 1661.22,
+    '66b': 1661.22,
+    '66': 1760.00,
+    '66s': 1864.66,
+    '67b': 1864.66,
+    '67': 1975.53,
+    '71': 2093.00,
+    '71s': 2217.46,
+    '72b': 2217.46,
+    '72': 2349.32,
+    '72s': 2489.02,
+    '73b': 2489.02,
+    '73': 2637.02,
+    '74': 2793.83,
+    '74s': 2959.96,
+    '75b': 2959.96,
+    '75': 3135.96,
+    '75s': 3322.44,
+    '76b': 3322.44,
+    '76': 3520.00,
+    '76s': 3729.31,
+    '77b': 3729.31,
+    '77': 3951.07,
+    '81': 4186.01
+};
+
+},{}]},{},[6])(6)});
