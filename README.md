@@ -30,6 +30,59 @@ Band.js - Music Composer
 * [Zelda Main Theme](http://plnkr.co/edit/jFnos1?p=preview) - Created by [legosjedi](http://www.reddit.com/user/legosjedi)
 * [Frog's Theme - Chrono Trigger](http://plnkr.co/edit/vVrFxg?p=preview) - Created by Me & Jarred Mack
 
+
+#### Procedural and Latino Notation
+
+Do Re Mi Fa example:
+
+       ```javascript
+       var conductor = new BandJS();
+       conductor.setTimeSignature(4,4);
+       conductor.setTempo(120);
+       conductor.constructor('equalProcedural', 'latino');  
+
+       var piano = conductor.createInstrument(),
+               p = piano.note,
+               r = piano.rest; 
+
+               p('2', '41')
+               p('2', '42')
+               p('2', '43')
+               p('2', '44')
+               r('2')
+               p('2', '44')
+               p('2', '44')
+               r('2')
+               p('2', '41')
+               p('2', '42')
+               p('2', '41')
+               p('2', '42')
+               r('2')
+               p('2', '42')
+               p('2', '42')
+               r('2')
+               p('2', '41')
+               p('2', '45')
+               p('2', '44')
+               p('2', '43')
+               r('2')
+               p('2', '43')
+               p('2', '43')
+               r('2')
+               p('2', '41')
+               p('2', '42')
+               p('2', '43')
+               p('2', '44')
+               r('2')
+               p('2', '44')
+               p('2', '44'); 
+
+        var player = conductor.finish();
+
+        player.play();
+
+        ```
+
 #### In The News
 
 * [Retro Game Music using Web Audio API and Band.js](http://modernweb.com/2013/09/09/retro-game-music-using-web-audio-and-band-js/)
