@@ -35,7 +35,7 @@ Band.js - Music Composer
 
 Do Re Mi Fa example:
 
-       ```javascript
+    ```javascript
        var conductor = new BandJS();
        conductor.setTimeSignature(4,4);
        conductor.setTempo(120);
@@ -80,8 +80,7 @@ Do Re Mi Fa example:
         var player = conductor.finish();
 
         player.play();
-
-        ```
+    ```
 
 #### In The News
 
