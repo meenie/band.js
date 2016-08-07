@@ -32,7 +32,7 @@ Band.js - Music Composer
 
 *** 
 
-### Procedural and Latino Notation
+### Procedural Latino Notation
 
 1. **Notation**: 
 
