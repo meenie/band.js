@@ -30,27 +30,28 @@ Band.js - Music Composer
 * [Zelda Main Theme](http://plnkr.co/edit/jFnos1?p=preview) - Created by [legosjedi](http://www.reddit.com/user/legosjedi)
 * [Frog's Theme - Chrono Trigger](http://plnkr.co/edit/vVrFxg?p=preview) - Created by Me & Jarred Mack
 
+*** 
 
-#### Procedural and Latino Notation
+### Procedural and Latino Notation
 
-1. Notation: 
+1. **Notation**: 
 
     ```javascript
     Instrument(Rhythm, Note);
     ```
   
-Instrument: In the library there are 4 oscillators and 5 noises.
+**Instrument**: In the library there are 4 oscillators and 5 noises.
 
-Rhythm: Value from 1 to 16.
+**Rhythm**: Value from 1 to 16.
 Example: 1 = sixteenth; 4 = quarter; 16 = whole. See image: http://i.imgur.com/IQURaxM.png
 
-Note: First digit is octave, second digit is note, third digit if 0 is flat or 1 is sharp.
+**Note**: First digit is octave, second digit is note, third digit if 0 is flat or 1 is sharp.
 Example: 01 = C0; 011 = c#0; 02 = D0; 020 = Db0; 77 = B7
 
-1. Do Re Mi Fa example: 
+2. **Do Re Mi Fa example**: 
 
     ```javascript
-    Instrument(Rhythm, Note);    
+       
     var conductor = new BandJS();
     conductor.setTimeSignature(4,4);
     conductor.setTempo(120);
