@@ -38,6 +38,10 @@ Notation:
     
     Instrument(Rhythm, Note)
     
+    ```javascript
+    var s = "JavaScript syntax highlighting";
+    alert(s);
+    ```
 
 Instrument: In the library there are 4 oscillators and 5 noises.
 
