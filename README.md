@@ -33,54 +33,71 @@ Band.js - Music Composer
 
 #### Procedural and Latino Notation
 
+Notation: 
+
+    ```javascript
+    Instrument(Rhythm, Note)
+    ```
+
+Instrument: In the library there are 4 oscillators and 5 noises.
+
+Rhythm: Value from 1 to 16.
+Example: 1 = sixteenth; 4 = quarter; 16 = whole. See image: http://i.imgur.com/IQURaxM.png
+
+Note: First digit is octave, second digit is note, third digit if 0 is flat or 1 is sharp.
+Example: 01 = C0; 011 = c#0; 02 = D0; 020 = Db0; 77 = B7
+
+
 Do Re Mi Fa example:
 
     ```javascript
-       var conductor = new BandJS();
-       conductor.setTimeSignature(4,4);
-       conductor.setTempo(120);
-       conductor.constructor('equalProcedural', 'latino');  
+    var conductor = new BandJS();
+    conductor.setTimeSignature(4,4);
+    conductor.setTempo(120);
 
-       var piano = conductor.createInstrument(),
+    conductor.constructor('equalProcedural', 'latino');
+
+    var piano = conductor.createInstrument(),
                p = piano.note,
-               r = piano.rest; 
+               r = piano.rest;
 
-               p('2', '41')
-               p('2', '42')
-               p('2', '43')
-               p('2', '44')
-               r('2')
-               p('2', '44')
-               p('2', '44')
-               r('2')
-               p('2', '41')
-               p('2', '42')
-               p('2', '41')
-               p('2', '42')
-               r('2')
-               p('2', '42')
-               p('2', '42')
-               r('2')
-               p('2', '41')
-               p('2', '45')
-               p('2', '44')
-               p('2', '43')
-               r('2')
-               p('2', '43')
-               p('2', '43')
-               r('2')
-               p('2', '41')
-               p('2', '42')
-               p('2', '43')
-               p('2', '44')
-               r('2')
-               p('2', '44')
-               p('2', '44'); 
+               p(2, 41)
+               p(2, 42)
+               p(2, 43)
+               p(2, 44)
+               r(2)
+               p(2, 44)
+               p(2, 44)
+               r(2)
+               p(2, 41)
+               p(2, 42)
+               p(2, 41)
+               p(2, 42)
+               r(2)
+               p(2, 42)
+               p(2, 42)
+               r(2)
+               p(2, 41)
+               p(2, 45)
+               p(2, 44)
+               p(2, 43)
+               r(2)
+               p(2, 43)
+               p(2, 43)
+               r(2)
+               p(2, 41)
+               p(2, 42)
+               p(2, 43)
+               p(2, 44)
+               r(2)
+               p(2, 44)
+               p(2, 44); 
 
         var player = conductor.finish();
 
         player.play();
     ```
+    
 
 #### In The News
 
