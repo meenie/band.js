@@ -19,10 +19,7 @@ Band.js - Music Composer
     piano.note('quarter', 'E4');
     piano.note('quarter', 'F4');
     ```
-    ```javascript
-    Instrument(Rhythm, Note);
-    ```
-    
+
 7. Tell the `conductor` everything is done: `var player = conductor.finish();`. It will return you the player instance to use for playing, pausing, muting, stopping, and seeking.
 8. Start playing the music: `player.play()`
 
@@ -36,16 +33,12 @@ Band.js - Music Composer
 
 #### Procedural and Latino Notation
 
-Notation: 
+1. Notation: 
 
-    
+    ```javascript
     Instrument(Rhythm, Note);
-    
-    '''javascript
-    var s = "JavaScript syntax highlighting";
-    alert(s);
-    '''
-
+    ```
+  
 Instrument: In the library there are 4 oscillators and 5 noises.
 
 Rhythm: Value from 1 to 16.
