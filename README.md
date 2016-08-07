@@ -47,10 +47,10 @@ Example: 1 = sixteenth; 4 = quarter; 16 = whole. See image: http://i.imgur.com/I
 Note: First digit is octave, second digit is note, third digit if 0 is flat or 1 is sharp.
 Example: 01 = C0; 011 = c#0; 02 = D0; 020 = Db0; 77 = B7
 
-
-Do Re Mi Fa example:
+1. Do Re Mi Fa example: 
 
     ```javascript
+    Instrument(Rhythm, Note);    
     var conductor = new BandJS();
     conductor.setTimeSignature(4,4);
     conductor.setTempo(120);
@@ -97,7 +97,6 @@ Do Re Mi Fa example:
 
         player.play();
     ```
-    
 
 #### In The News
 
