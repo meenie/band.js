@@ -19,6 +19,12 @@ Band.js - Music Composer
     piano.note('quarter', 'E4');
     piano.note('quarter', 'F4');
     ```
+    ```javascript
+    piano.note('quarter', 'C4');
+    piano.note('quarter', 'D4');
+    piano.note('quarter', 'E4');
+    piano.note('quarter', 'F4');
+    ```
     
 7. Tell the `conductor` everything is done: `var player = conductor.finish();`. It will return you the player instance to use for playing, pausing, muting, stopping, and seeking.
 8. Start playing the music: `player.play()`
