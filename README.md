@@ -20,10 +20,7 @@ Band.js - Music Composer
     piano.note('quarter', 'F4');
     ```
     ```javascript
-    piano.note('quarter', 'C4');
-    piano.note('quarter', 'D4');
-    piano.note('quarter', 'E4');
-    piano.note('quarter', 'F4');
+    Instrument(Rhythm, Note);
     ```
     
 7. Tell the `conductor` everything is done: `var player = conductor.finish();`. It will return you the player instance to use for playing, pausing, muting, stopping, and seeking.
@@ -42,7 +39,7 @@ Band.js - Music Composer
 Notation: 
 
     
-    Instrument(Rhythm, Note)
+    Instrument(Rhythm, Note);
     
     '''javascript
     var s = "JavaScript syntax highlighting";
