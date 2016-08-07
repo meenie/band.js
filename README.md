@@ -58,7 +58,7 @@ Example: 01 = C0; 011 = c#0; 02 = D0; 020 = Db0; 77 = B7
 
     conductor.constructor('equalProcedural', 'latino');
 
-    var piano = conductor.createInstrument(),
+    var piano = conductor.createInstrument('sine', 'oscillators'),
                p = piano.note,
                r = piano.rest;
 
