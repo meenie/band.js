@@ -35,9 +35,9 @@ Band.js - Music Composer
 
 Notation: 
 
-    ```javascript
+    
     Instrument(Rhythm, Note)
-    ```
+    
 
 Instrument: In the library there are 4 oscillators and 5 noises.
 
