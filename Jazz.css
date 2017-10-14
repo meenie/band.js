@@ -1,0 +1,7 @@
+.timing, .cover-art, .controls {
+    margin-bottom: 10px;
+}
+
+.timing span {
+    font-size: 23px;
+}
