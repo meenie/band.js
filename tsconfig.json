@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "lib": ["es2020", "dom"], // Added "dom"
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "emitDeclarationOnly": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "outDir": "./dist",
+    "declarationDir": "./dist",
+  },
+  "include": ["src/**/*.ts", "examples/**/*.ts", "test/**/*.test.ts"],
+  "exclude": ["node_modules", "dist"]
+}

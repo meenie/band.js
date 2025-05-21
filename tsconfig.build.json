@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // No need to override outDir or declarationDir if they are already ./dist
+    // and rootDir is "src" in the main tsconfig.json
+    // emitDeclarationOnly is also inherited.
+  },
+  "include": ["src/**/*.ts"], // Only include src for build declarations
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test", // Explicitly exclude test
+    "examples" // Explicitly exclude examples
+  ]
+}
