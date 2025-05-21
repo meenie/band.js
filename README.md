@@ -75,24 +75,72 @@ Band.js - Music Composer
 
 | Method | Params | Description |
 |---|---|---|
-| `constructor(tuning, rhythm)` | `tuning: 'equalTemperament'` <br> `rhythm: 'northAmerican'` | When creating a new `Conductor` object, you can pass in the names of the tuning and rhythm notation packs you want to use. These packs must be loaded beforehand using `Conductor.loadPack()`. By default, if these packs are loaded with the names 'equalTemperament' and 'northAmerican', the constructor will use them. |
-| `setTimeSignature(top, bottom)` | `top: 4` <br> `bottom: 4` | This will set the Time Signature for the music. Any number of top numbers (how many beats per bar) can be set, but the bottom number (which note gets the beat) can only be 2, 4, or 8. |
+| `constructor(tuning, rhythm)` | `tuning: 'equalTemperament'`  `rhythm: 'northAmerican'` | When creating a new `Conductor` object, you can pass in the names of the tuning and rhythm notation packs you want to use. These packs must be loaded beforehand using `Conductor.loadPack()`. By default, if these packs are loaded with the names 'equalTemperament' and 'northAmerican', the constructor will use them. |
+| `setTimeSignature(top, bottom)` | `top: 4`  `bottom: 4` | This will set the Time Signature for the music. Any number of top numbers (how many beats per bar) can be set, but the bottom number (which note gets the beat) can only be 2, 4, or 8. |
 | `setTempo(tempo)` | `tempo: 120` | Set the tempo (BPM) of the music. If a player has been instantiated, then the `onDurationChangeCallback` will be called. |
 | `setMasterVolume(volume)` | `volume: 100` | Set the master volume of the music. From 0 to 100. |
 | `getTotalSeconds()` | `n/a` | Returns the total number of seconds a song is. |
-| `setNoteBufferLength(bufferLength)` | `bufferLength: 20` | Set the number of notes that are buffered every (tempo / 60 * 5) seconds. <br> **WARNING** The higher this is, the more memory is used and can crash your browser. If notes are being dropped, you can increase this, but be wary of used memory. |
+| `setNoteBufferLength(bufferLength)` | `bufferLength: 20` | Set the number of notes that are buffered every (tempo / 60 * 5) seconds.  **WARNING** The higher this is, the more memory is used and can crash your browser. If notes are being dropped, you can increase this, but be wary of used memory. |
 | `finish()` | `n/a` | Totals up the duration of the song and returns the Player Class. |
 | `setOnFinishedCallback(callback)` | `callback: Func` | Pass in a function that will be called when the music has completed. |
 | `setTickerCallback(callback)` | `callback: Func` | Pass in a function that will be called every second the music is playing. It will pass the current number of seconds that have passed. |
 | `setOnDurationChangeCallback(callback)` | `callback: Func` | Pass in a function that will be called when the duration of a song has changed. Most likely it's because you have changed the tempo of a song. |
-| `createInstrument(name, pack)` | `name: 'sine'` <br> `pack: 'oscillators'` | Creates an instrument that you can add notes/rests with. The first argument is the name of the instrument sound (e.g., 'sine', 'square' for oscillators; 'white', 'pink' for noises) and the second is the name of the instrument pack it should use (e.g., 'oscillators'). The specified pack must be loaded first via `Conductor.loadPack()`. If `pack` is not specified, it defaults to a pack named 'oscillators'. If `name` is not specified, it may default to a common sound like 'sine' if available in the pack. |
-| `load(json)` | `json: JSON` | Load a song into Band.js using JSON. Returns the Player Class. Format is: (**This will erase your current song and overwrite it with this new one**)<br><pre>{\n    timeSignature: [4, 4],\n    tempo: 100,\n    instruments: {\n        rightHand: {\n            name: 'square', // Sound name within the pack\n            pack: 'oscillators' // Name of the loaded pack\n        },\n        leftHand: {\n            name: 'sawtooth',\n            pack: 'oscillators'\n        }\n    },\n    notes: {\n        // Shorthand notation\n        rightHand: [\n            'quarter|E5, F#4|tie',\n            'quarter|rest',\n            'quarter|E5, F#4',\n            'quarter|rest'\n        ],\n        // More verbose notation\n        leftHand: [\n            {\n                type: 'note',\n                pitch: 'D3',\n                rhythm: 'quarter'\n            }\n        ]\n    }\n}</pre> |
+| `createInstrument(name, pack)` | `name: 'sine'`  `pack: 'oscillators'` | Creates an instrument that you can add notes/rests with. The first argument is the name of the instrument sound (e.g., 'sine', 'square' for oscillators; 'white', 'pink' for noises) and the second is the name of the instrument pack it should use (e.g., 'oscillators'). The specified pack must be loaded first via `Conductor.loadPack()`. If `pack` is not specified, it defaults to a pack named 'oscillators'. If `name` is not specified, it may default to a common sound like 'sine' if available in the pack. |
+| `load(json)` | `json: JSON` | Load a song into Band.js using JSON. Returns the Player Class. (**This will erase your current song and overwrite it with this new one**). See the "Loading Songs with JSON" section below for the required format. |
+
+###### Loading Songs with JSON
+
+The `load(json)` method expects a JSON object with the following structure:
+
+```json
+{
+  "timeSignature": [4, 4],
+  "tempo": 100,
+  "instruments": {
+    "rightHand": {
+      "name": "square",
+      "pack": "oscillators"
+    },
+    "leftHand": {
+      "name": "sawtooth",
+      "pack": "oscillators"
+    }
+  },
+  "notes": {
+    "rightHand": [
+      "quarter|E5, F#4|tie",
+      "quarter|rest",
+      "quarter|E5, F#4",
+      "quarter|rest"
+    ],
+    "leftHand": [
+      {
+        "type": "note",
+        "pitch": "D3",
+        "rhythm": "quarter"
+      }
+    ]
+  }
+}
+```
 
 ##### Conductor Class Static Methods
 
 | Method | Params | Description |
 |---|---|---|
-| `loadPack(type, name, data)` | `type`: 'instrument', 'rhythm', or 'tuning'<br>`name`: Name you want to give the pack (string)<br>`data`: The imported pack module/data. | Use this method to load in different packs. <br> **Example:** <br> ```typescript <br> import { Conductor } from '@meenie/band.js'; <br> import oscillatorsPack from '@meenie/band.js/instrument-packs/oscillators'; <br> import customRhythms from './my-custom-rhythms'; // Assuming a local file <br><br> Conductor.loadPack('instrument', 'oscillators', oscillatorsPack); <br> Conductor.loadPack('rhythm', 'myCustomSet', customRhythms); <br> ``` <br> **Data Format:** <br> - **Rhythm Pack (`type: 'rhythm'`):** `data` should be an object where keys are rhythm names (e.g., 'whole', 'half') and values are their duration multipliers (e.g., `1`, `0.5`). Example: `{ whole: 1, half: 0.5 }`. <br> - **Tuning Pack (`type: 'tuning'`):** `data` should be an object where keys are pitch names (e.g., 'A4', 'C#5') and values are their frequencies in Hz (e.g., `440.00`, `554.37`). Example: `{'A4': 440.00, 'A#4': 466.16}`. <br> - **Instrument Pack (`type: 'instrument'`):** `data` is typically an imported module which is a function. This function is called by Band.js with `(soundName, audioContext)` and should return an object with at least one method: `createNote(destination, frequency?)`. This method is responsible for creating and returning an `AudioNode` (like `OscillatorNode` or `AudioBufferSourceNode`) connected to the provided `destination`. The `frequency` is provided for pitched instruments. See `src/instrument-packs/` for examples like `oscillators.ts` or `noises.ts`. |
+| `loadPack(type, name, data)` | `type` (string): 'instrument', 'rhythm', or 'tuning'`name` (string): Name you want to give the pack`data` (object/module): The imported pack module/data. | Use this method to load in different packs.**Example:**
+```typescript
+import { Conductor } from '@meenie/band.js';
+import oscillatorsPack from '@meenie/band.js/instrument-packs/oscillators';
+import customRhythms from './my-custom-rhythms'; // Assuming a local file
+
+Conductor.loadPack('instrument', 'oscillators', oscillatorsPack);
+Conductor.loadPack('rhythm', 'myCustomSet', customRhythms);
+```
+**Data Format:**
+  - **Rhythm Pack (`type: 'rhythm'`):** `data` should be an object where keys are rhythm names (e.g., 'whole', 'half') and values are their duration multipliers (e.g., `1`, `0.5`). Example: `{ whole: 1, half: 0.5 }`.
+  - **Tuning Pack (`type: 'tuning'`):** `data` should be an object where keys are pitch names (e.g., 'A4', 'C#5') and values are their frequencies in Hz (e.g., `440.00`, `554.37`). Example: `{'A4': 440.00, 'A#4': 466.16}`.
+  - **Instrument Pack (`type: 'instrument'`):** `data` is typically an imported module which is a function. This function is called by Band.js with `(soundName, audioContext)` and should return an object with at least one method: `createNote(destination, frequency?)`. This method is responsible for creating and returning an `AudioNode` (like `OscillatorNode` or `AudioBufferSourceNode`) connected to the provided `destination`. The `frequency` is provided for pitched instruments. See `src/instrument-packs/` for examples like `oscillators.ts` or `noises.ts`.
 
 ##### Player Class - Returned from the Conductor Class when calling `Conductor.finish()`
 
@@ -110,7 +158,7 @@ Band.js - Music Composer
 
 | Method | Params | Description |
 |---|---|---|
-| `note(rhythm, pitch, tie)` | `rhythm`: Must be set (string, e.g., 'quarter')<br>`pitch`: Optional (string, e.g., 'C4')<br>`tie: false` (boolean) | Adds a note to the stack of notes for the particular instrument.<br> `rhythm` refers to a key in a loaded rhythm pack (e.g., 'northAmerican'). Common rhythms include: <br> * whole <br> * dottedHalf <br> * half <br> * dottedQuarter <br> * tripletHalf <br> * quarter <br> * dottedEighth <br> * tripletQuarter <br> * eighth <br> * dottedSixteenth <br> * tripletEighth <br> * sixteenth <br> * tripletSixteenth <br> * thirtySecond <br> `pitch` is optional and can be any note name defined in the loaded tuning pack (e.g., 'C0' to 'C8', 'Bb3', 'G#7'). <br> `tie` can tie two notes together without any gap. By default, the library puts in an articulation gap of about a tenth of the length of the note. |
+| `note(rhythm, pitch, tie)` | `rhythm`: Must be set (string, e.g., 'quarter') `pitch`: Optional (string, e.g., 'C4') `tie: false` (boolean) | Adds a note to the stack of notes for the particular instrument.  `rhythm` refers to a key in a loaded rhythm pack (e.g., 'northAmerican'). Common rhythms include:  * whole  * dottedHalf  * half  * dottedQuarter  * tripletHalf  * quarter  * dottedEighth  * tripletQuarter  * eighth  * dottedSixteenth  * tripletEighth  * sixteenth  * tripletSixteenth  * thirtySecond  `pitch` is optional and can be any note name defined in the loaded tuning pack (e.g., 'C0' to 'C8', 'Bb3', 'G#7').  `tie` can tie two notes together without any gap. By default, the library puts in an articulation gap of about a tenth of the length of the note. |
 | `rest(rhythm)` | `rhythm`: Must be set (string) | Adds a rest to the list of notes. Use a rhythm name from a loaded rhythm pack. |
 | `setVolume(volume)` | `volume: 25` | Sets the volume for this particular instrument. From 0 to 100. You can call this multiple times before notes to change their volume at that point of the music. |
 | `repeatStart()` | `n/a` | Puts in a marker where a section of music should be repeated from. |
