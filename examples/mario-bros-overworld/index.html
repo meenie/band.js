@@ -1,73 +1,178 @@
 <!DOCTYPE html>
-
-<html lang="en" ng-app="app">
-<head>
+<html lang="en">
+  <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Super Mario Bros Overworld</title>
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="app.css" rel="stylesheet">
-    <script src="//code.angularjs.org/1.2.0rc1/angular.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.5.0/ui-bootstrap-tpls.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.1.0/moment.min.js"></script>
-
-    <!-- Band.JS Files -->
-    <script src="../../dist/band.min.js"></script>
-
-    <!-- App Files -->
-    <script src="app.js"></script>
-</head>
-<body ng-controller="AppController">
-<div class="container">
-    <div class="row">
-        <div class="col-xs-12 text-center">
-            <h3><strong>Super Mario Bros Overworld Theme</strong></h3>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Super Mario Bros Overworld - Band.js Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script type="module" src="./app.ts"></script>
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto p-4">
+      <div class="text-center mb-8">
+        <h3 class="text-3xl font-bold mb-2">
+          <strong>Super Mario Bros Overworld Theme</strong>
+        </h3>
+      </div>
+      <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <div class="timing text-center mb-4">
+          <span id="currentTime" class="music-time text-2xl">0:00</span>
+          <input
+            id="timeSlider"
+            type="range"
+            value="0"
+            max="0"
+            class="w-3/4 mx-2 align-middle"
+          />
+          <span id="totalTime" class="music-time text-2xl">0:00</span>
         </div>
-    </div>
-    <div class="row" ng-cloak>
-        <div class="col-lg-10 col-lg-offset-1">
-            <div class="row timing">
-                <div class="col-xs-12 text-center">
-                    <span class="music-time">{{currentSeconds|musicTime}}</span>
-                    <input ng-mousedown="movingTime()" ng-mouseup="updateTime()" type="range" max="{{totalSeconds}}" ng-model="currentSeconds">
-                    <span class="music-time">{{totalSeconds|musicTime}}</span>
-                </div>
-            </div>
-            <div class="row cover-art">
-                <div class="col-xs-12 text-center">
-                    <img src="http://i.imgur.com/oc4m2Z7.png" alt="Super Mario Bros">
-                </div>
-            </div>
-            <div class="row controls">
-                <div class="col-xs-12 text-center">
-                    <div class="btn-group">
-                        <button ng-if="! playing || paused" ng-click="play()" class="btn btn-default"><i class="glyphicon glyphicon-play"></i></button>
-                        <button ng-if="! paused && playing" ng-click="pause()" class="btn btn-default"><i class="glyphicon glyphicon-pause"></i></button>
-                        <button ng-click="stop()" class="btn btn-default"><i class="glyphicon glyphicon-stop"></i></button>
-                        <button class="btn btn-default" ng-model="mute" btn-checkbox><i class="glyphicon glyphicon-volume-off"></i></button>
-                        <button class="btn btn-default" ng-model="loop" btn-checkbox><i class="glyphicon glyphicon-repeat"></i></button>
-                    </div>
-                </div>
-            </div>
-            <div class="row volume">
-                <div class="col-xs-12 text-center">
-                    <label for="update-volume">Volume: {{volume}}</label><br>
-                    <input id="update-volume" ng-disabled="muted" type="range" ng-model="volume">
-                </div>
-            </div>
-            <div class="row tempo">
-                <div class="col-xs-12 text-center">
-                    <label for="update-tempo">Tempo: {{tempo}}</label><br>
-                    <input id="update-tempo" type="range" min="30" max="300" ng-model="tempo" ng-mouseup="updateTempo()">
-                </div>
-            </div>
+        <div class="cover-art text-center mb-4">
+          <img
+            src="http://i.imgur.com/oc4m2Z7.png"
+            alt="Super Mario Bros"
+            class="mx-auto rounded shadow"
+          />
         </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12 text-center">
-            <h5>Created by <a href="https://github.com/meenie" target="_blank">Cody Lundquist</a> using <a href="https://github.com/meenie/band.js" target="_blank">Band.js</a></h5>
-            <h6>Only works in latest chrome or safari!</h6>
+        <div class="controls text-center mb-4">
+          <div class="inline-flex rounded-md shadow-sm" role="group">
+            <button
+              id="playBtn"
+              class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+            >
+              <svg
+                class="w-5 h-5 inline-block"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Play
+            </button>
+            <button
+              id="pauseBtn"
+              style="display: none"
+              class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+            >
+              <svg
+                class="w-5 h-5 inline-block"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h1a1 1 0 001-1V8a1 1 0 00-1-1H8zm3 0a1 1 0 00-1 1v4a1 1 0 001 1h1a1 1 0 001-1V8a1 1 0 00-1-1h-1z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Pause
+            </button>
+            <button
+              id="stopBtn"
+              class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+            >
+              <svg
+                class="w-5 h-5 inline-block"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 9a1 1 0 00-1 1v1a1 1 0 001 1h4a1 1 0 001-1v-1a1 1 0 00-1-1H8z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Stop
+            </button>
+            <button
+              id="muteBtn"
+              class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+            >
+              <svg
+                class="w-5 h-5 inline-block"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Mute
+            </button>
+            <button
+              id="loopBtn"
+              class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+            >
+              <svg
+                class="w-5 h-5 inline-block"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4 2a1 1 0 00-1 1v2.101a7.002 7.002 0 0011.601 2.966l-1.204-1.204a5.002 5.002 0 01-7.79-2.056l1.391.752A1 1 0 0010 6V3a1 1 0 00-1-1H4zm12 14a1 1 0 001-1v-2.101a7.002 7.002 0 00-11.601-2.966l1.204 1.204a5.002 5.002 0 017.79 2.056l-1.39-.752A1 1 0 0010 14v3a1 1 0 001 1h4z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+              Loop
+            </button>
+          </div>
         </div>
+        <div class="volume text-center mb-4">
+          <label for="volumeSlider" class="block mb-1"
+            >Volume: <span id="volumeValue">50</span></label
+          >
+          <input
+            id="volumeSlider"
+            type="range"
+            value="50"
+            min="0"
+            max="100"
+            class="w-1/2"
+          />
+        </div>
+        <div class="tempo text-center">
+          <label for="tempoSlider" class="block mb-1"
+            >Tempo: <span id="tempoValue">180</span></label
+          >
+          <input
+            id="tempoSlider"
+            type="range"
+            min="30"
+            max="300"
+            value="180"
+            class="w-1/2"
+          />
+        </div>
+      </div>
+      <div class="text-center mt-8 text-sm text-gray-500">
+        <h5>
+          Created by
+          <a
+            href="https://github.com/meenie"
+            target="_blank"
+            class="text-blue-500 hover:underline"
+            >Cody Lundquist</a
+          >
+          using
+          <a
+            href="https://github.com/meenie/band.js"
+            target="_blank"
+            class="text-blue-500 hover:underline"
+            >Band.js</a
+          >
+        </h5>
+      </div>
     </div>
-</div>
-</body>
+  </body>
 </html>

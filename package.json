@@ -1,33 +1,64 @@
 {
-  "name": "BandJS",
-  "version": "1.1.2",
+  "name": "@meenie/band.js",
+  "version": "2.0.0",
   "description": "Band.js - Music Composer - An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex time signatures.",
-  "main": "src/main.js",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./instrument-packs/*": {
+      "import": "./dist/instrument-packs/*.js",
+      "types": "./dist/instrument-packs/*.d.ts"
+    },
+    "./rhythm-packs/*": {
+      "import": "./dist/rhythm-packs/*.js",
+      "types": "./dist/rhythm-packs/*.d.ts"
+    },
+    "./tuning-packs/*": {
+      "import": "./dist/tuning-packs/*.js",
+      "types": "./dist/tuning-packs/*.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build:js": "bun build ./src/index.ts ./src/instrument-packs/noises.ts ./src/instrument-packs/oscillators.ts ./src/rhythm-packs/european.ts ./src/rhythm-packs/north-american.ts ./src/tuning-packs/equal-temperament.ts --outdir ./dist --target browser --minify --sourcemap",
+    "build:types": "tsc -p tsconfig.build.json",
+    "build": "bun run clean && bun run build:js && bun run build:types",
+    "test": "bun test",
+    "example:mario": "bun run examples/mario-bros-overworld/server.ts",
+    "prepublishOnly": "bun run build && bun run test"
+  },
   "repository": {
     "type": "git",
-    "url": "ssh://git@github.com:meenie/band.js.git"
+    "url": "git+ssh://git@github.com/meenie/band.js.git"
   },
   "author": "Cody Lundquist",
   "license": "MIT",
+  "keywords": [
+    "webaudio",
+    "music",
+    "audio",
+    "sequencer",
+    "player"
+  ],
   "devDependencies": {
-    "audiocontext": "0.1.0",
-    "browserify": "^4.2.1",
-    "grunt": "0.4.1",
-    "grunt-browserify": "2.1.3",
-    "grunt-bump": "0.0.14",
-    "grunt-checkbranch": "^0.3.1",
-    "grunt-contrib-clean": "^0.5.0",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-contrib-uglify": "0.2.2",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-karma": "^0.8.3",
-    "grunt-prompt": "^1.1.0",
-    "karma": "^0.12.17",
-    "karma-browserify": "^0.2.1",
-    "karma-jasmine": "^0.1.5",
-    "karma-phantomjs-launcher": "^0.1.4",
-    "load-grunt-config": "^0.12.0",
+    "@types/bun": "latest",
+    "@types/sinon": "^17.0.4",
     "semver": "^2.3.1",
-    "time-grunt": "^0.4.0"
+    "standardized-audio-context-mock": "^9.7.22",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "standardized-audio-context": "^25.3.77"
   }
 }
