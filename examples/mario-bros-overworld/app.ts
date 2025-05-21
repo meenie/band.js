@@ -1,10 +1,4 @@
 import Conductor from "@/index.ts";
-import oscillators from "@/instrument-packs/oscillators.ts";
-import noises from "@/instrument-packs/noises.ts";
-
-// Load instrument packs
-Conductor.loadPack("instrument", "oscillators", oscillators);
-Conductor.loadPack("instrument", "noises", noises);
 
 document.addEventListener("DOMContentLoaded", () => {
   let tempo = 180;

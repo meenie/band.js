@@ -14,23 +14,15 @@ Band.js - Music Composer
 2.  Set up your project to use ES Modules. Then, import `Conductor` and the sound packs:
 
     ```typescript
-    import { Conductor } from '@meenie/band.js';
-    // Import the default packs (or any other packs you need)
-    // Paths are based on package.json "exports" (e.g., "@meenie/band.js/instrument-packs/oscillators")
-    import oscillatorsPack from '@meenie/band.js/instrument-packs/oscillators';
-    import northAmericanRhythms from '@meenie/band.js/rhythm-packs/north-american';
-    import equalTemperamentTuning from '@meenie/band.js/tuning-packs/equal-temperament';
-
-    // Load the packs into the Conductor
-    // It's recommended to load them with their standard names if you want to rely on existing defaults
-    Conductor.loadPack('instrument', 'oscillators', oscillatorsPack);
-    Conductor.loadPack('rhythm', 'northAmerican', northAmericanRhythms);
-    Conductor.loadPack('tuning', 'equalTemperament', equalTemperamentTuning);
+    import Conductor from '@meenie/band.js';
 
     // Create a new Conductor instance.
-    // If 'equalTemperament' and 'northAmerican' packs are loaded as above,
-    // the constructor can use them by default or by name.
-    const conductor = new Conductor(); // Or: new Conductor('equalTemperament', 'northAmerican');
+    // Default packs (oscillators, noises, northAmerican rhythms, equalTemperament tuning)
+    // are loaded automatically when Conductor is imported.
+    const conductor = new Conductor();
+    // You can also specify default tuning and rhythm packs by name if needed,
+    // for example, if you've loaded other packs and want to ensure these are used:
+    // const conductor = new Conductor('equalTemperament', 'northAmerican');
 
     // Set time signature and tempo
     conductor.setTimeSignature(4, 4);
@@ -130,7 +122,7 @@ The `load(json)` method expects a JSON object with the following structure:
 |---|---|---|
 | `loadPack(type, name, data)` | `type` (string): 'instrument', 'rhythm', or 'tuning'`name` (string): Name you want to give the pack`data` (object/module): The imported pack module/data. | Use this method to load in different packs.**Example:**
 ```typescript
-import { Conductor } from '@meenie/band.js';
+import Conductor from '@meenie/band.js';
 import oscillatorsPack from '@meenie/band.js/instrument-packs/oscillators';
 import customRhythms from './my-custom-rhythms'; // Assuming a local file
 
