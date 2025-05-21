@@ -1,6 +1,6 @@
 {
   "name": "@meenie/band.js",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Band.js - Music Composer - An interface for the Web Audio API that supports rhythms, multiple instruments, repeating sections, and complex time signatures.",
   "type": "module",
   "main": "dist/index.js",
