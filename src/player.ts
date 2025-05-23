@@ -6,7 +6,7 @@
  * @author Cody Lundquist (http://github.com/meenie) - 2014
  */
 import type Conductor from "./conductor"; // Use type import
-import type { Note as InstrumentNote } from "./instrument"; // Assuming Note interface is exported from instrument.ts
+import type Instrument from "./instrument"; // Add Instrument type import
 import type {
   IAudioContext,
   IAudioScheduledSourceNode,
@@ -52,8 +52,11 @@ export default class Player {
       const instrument = this.conductor.instruments[index];
       if (resetDuration) {
         instrument.resetDuration();
+        instrument.bufferPosition = 0;
+      } else {
+        // When seeking (not resetting duration), find the appropriate buffer position
+        instrument.bufferPosition = this.findBufferPositionForTime(instrument, this.totalPlayTime);
       }
-      instrument.bufferPosition = 0;
     }
 
     if (resetDuration) {
@@ -70,6 +73,19 @@ export default class Player {
     }
     clearTimeout(this.bufferTimeout);
     this.allNotes = this.bufferNotes();
+  }
+
+  private findBufferPositionForTime(instrument: Instrument, targetTime: number): number {
+    // Find the first note that ends after the target time
+    // This ensures we buffer notes that are still relevant at the target time
+    for (let i = 0; i < instrument.notes.length; i++) {
+      const note = instrument.notes[i];
+      if (note && note.stopTime > targetTime) {
+        return i;
+      }
+    }
+    // If no note found (we're past the end), return the end of the array
+    return instrument.notes.length;
   }
 
   private fade(
